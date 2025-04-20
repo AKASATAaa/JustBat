@@ -3504,7 +3504,7 @@ Transform:
   m_GameObject: {fileID: 581633365}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.722, y: 0.759, z: 0.748}
+  m_LocalPosition: {x: 4.719, y: 0.702, z: 0.748}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6003,9 +6003,9 @@ Canvas:
   m_GameObject: {fileID: 966869639}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
+  m_RenderMode: 1
+  m_Camera: {fileID: 526467978}
+  m_PlaneDistance: 0.1
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -11099,7 +11099,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ba9545370f526ed4da86b1f1121163ba, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0
+      value: -0.049
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ba9545370f526ed4da86b1f1121163ba, type: 3}
       propertyPath: m_LocalPosition.z
@@ -12423,15 +12423,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ac276ee02b88554ab1cff7e9f2e63ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitForceMultiplier: 2
+  hitForceMultiplier: 1.1
   batSweetSpot: {fileID: 13330775}
   ballLayer:
     serializedVersion: 2
     m_Bits: 0
   sweepRadius: 0.1
   sweepResolution: 10
-  sweetSpotRadius: 0.2
-  sweetSpotMaxDistance: 0.27
+  sweetSpotRadius: 0.32
+  sweetSpotMaxDistance: 0.39
   sweetSpotFalloffRate: 10
   minQualityFactor: 0.4
   sweetSpotColor: {r: 1, g: 0, b: 0, a: 1}
@@ -12779,7 +12779,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.13
+  m_Radius: 0.22
   m_Height: 0.9392279
   m_Direction: 1
   m_Center: {x: 3.4453737e-10, y: 0.45142463, z: -0.000099999284}

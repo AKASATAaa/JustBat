@@ -1500,7 +1500,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &281147212
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1564,9 +1564,9 @@ Canvas:
   m_GameObject: {fileID: 281147211}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
+  m_RenderMode: 1
+  m_Camera: {fileID: 526467978}
+  m_PlaneDistance: 0.1
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -11826,15 +11826,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ac276ee02b88554ab1cff7e9f2e63ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitForceMultiplier: 2
+  hitForceMultiplier: 1.3
   batSweetSpot: {fileID: 13330775}
   ballLayer:
     serializedVersion: 2
     m_Bits: 0
   sweepRadius: 0.1
   sweepResolution: 10
-  sweetSpotRadius: 0.11
-  sweetSpotMaxDistance: 0.21
+  sweetSpotRadius: 0.23
+  sweetSpotMaxDistance: 0.3
   sweetSpotFalloffRate: 10
   minQualityFactor: 0.4
   sweetSpotColor: {r: 1, g: 0, b: 0, a: 1}
@@ -12182,7 +12182,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.07
+  m_Radius: 0.13
   m_Height: 0.9392279
   m_Direction: 1
   m_Center: {x: 3.4453737e-10, y: 0.45142463, z: -0.000099999284}
