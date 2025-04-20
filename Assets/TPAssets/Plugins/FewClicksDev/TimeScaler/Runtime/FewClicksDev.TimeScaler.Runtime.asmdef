@@ -1,0 +1,16 @@
+{
+    "name": "FewClicksDev.TimeScaler.Runtime",
+    "rootNamespace": "",
+    "references": [
+        "GUID:0ca41efbe926a1249a29269db2d2c754"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

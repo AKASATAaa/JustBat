@@ -1,0 +1,20 @@
+{
+    "name": "FewClickDev.TimeScaler.Editor",
+    "rootNamespace": "FewClicksDev.TimeScaler",
+    "references": [
+        "GUID:0fbf31bf5ea6e50409c2aaa7d5b2d13d",
+        "GUID:0ca41efbe926a1249a29269db2d2c754",
+        "GUID:5d528bb577a2b0a48ac73fad0c21a994"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea5fa805a89c7a3499bee566007828ae, type: 3}
+  m_Name: timeScalerPresetsList_OneToTen
+  m_EditorClassIdentifier: 
+  listName: One to Ten
+  positionPriority: 80
+  presets:
+  - Label: Paused
+    TimeScale: 0
+    Index: 0
+  - Label: Half
+    TimeScale: 0.5
+    Index: 0
+  - Label: One
+    TimeScale: 1
+    Index: 0
+  - Label: Two
+    TimeScale: 2
+    Index: 0
+  - Label: Three
+    TimeScale: 3
+    Index: 0
+  - Label: Four
+    TimeScale: 4
+    Index: 0
+  - Label: Five
+    TimeScale: 5
+    Index: 0
+  - Label: Six
+    TimeScale: 6
+    Index: 0
+  - Label: Eight
+    TimeScale: 8
+    Index: 0
+  - Label: Ten
+    TimeScale: 10
+    Index: 0
