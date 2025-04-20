@@ -1,144 +1,144 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
 
 public class BallController : MonoBehaviour
 {
-    // ÄÄÆ÷³ÍÆ® ÂüÁ¶
-    private Rigidbody ballRigidbody;               // ¹°¸® ½Ã¹Ä·¹ÀÌ¼ÇÀ» À§ÇÑ Rigidbody
+    // ì»´í¬ë„ŒíŠ¸ ì°¸ì¡°
+    private Rigidbody ballRigidbody;               // ë¬¼ë¦¬ ì‹œë®¬ë ˆì´ì…˜ì„ ìœ„í•œ Rigidbody
 
-    [Header("±¸Á¾Á¤º¸")]
-    public string pitchTypeName = "Fastball";      // Åõ±¸ Á¾·ù ÀÌ¸§
+    [Header("êµ¬ì¢…ì •ë³´")]
+    public string pitchTypeName = "Fastball";      // íˆ¬êµ¬ ì¢…ë¥˜ ì´ë¦„
 
-    [Header("¹æÇâ ¼³Á¤")]
-    [Tooltip("¹ß»ç ¹æÇâ º¤ÅÍ (¿ÜºÎ¿¡¼­ ¼³Á¤µÊ)")]
-    private Vector3 launchDirection;               // ¹ß»ç ¹æÇâ (¿ÜºÎ¿¡¼­ ¼³Á¤)
+    [Header("ë°©í–¥ ì„¤ì •")]
+    [Tooltip("ë°œì‚¬ ë°©í–¥ ë²¡í„° (ì™¸ë¶€ì—ì„œ ì„¤ì •ë¨)")]
+    private Vector3 launchDirection;               // ë°œì‚¬ ë°©í–¥ (ì™¸ë¶€ì—ì„œ ì„¤ì •)
 
-    [Header("°ø ¹°¸® ¼³Á¤")]
-    [Tooltip("°øÀ» ¹ß»çÇÏ´Â ÈûÀÇ Å©±â")]
-    public float initialForce;                     // ÃÊ±â ¹ß»ç Èû
-    [Tooltip("¼öÁ÷ ¹æÇâ È¸Àü ¼Óµµ")]
-    public float verticalRotationSpeed;            // ¼öÁ÷ È¸Àü ¼Óµµ
-    [Tooltip("¼öÆò ¹æÇâ È¸Àü ¼Óµµ")]
-    public float horizontalRotationSpeed;          // ¼öÆò È¸Àü ¼Óµµ
+    [Header("ê³µ ë¬¼ë¦¬ ì„¤ì •")]
+    [Tooltip("ê³µì„ ë°œì‚¬í•˜ëŠ” í˜ì˜ í¬ê¸°")]
+    public float initialForce;                     // ì´ˆê¸° ë°œì‚¬ í˜
+    [Tooltip("ìˆ˜ì§ ë°©í–¥ íšŒì „ ì†ë„")]
+    public float verticalRotationSpeed;            // ìˆ˜ì§ íšŒì „ ì†ë„
+    [Tooltip("ìˆ˜í‰ ë°©í–¥ íšŒì „ ì†ë„")]
+    public float horizontalRotationSpeed;          // ìˆ˜í‰ íšŒì „ ì†ë„
 
-    [Header("°¢µµ ¼³Á¤")]
-    [Tooltip("¼öÁ÷ ¹æÇâ ¹ß»ç°¢ Á¶Á¤ (µµ)")]
+    [Header("ê°ë„ ì„¤ì •")]
+    [Tooltip("ìˆ˜ì§ ë°©í–¥ ë°œì‚¬ê° ì¡°ì • (ë„)")]
     [Range(-45f, 45f)]
-    public float verticalAngleOffset;              // ¼öÁ÷ ¹ß»ç°¢ Á¶Á¤°ª
-    [Tooltip("¼öÆò ¹æÇâ ¹ß»ç°¢ Á¶Á¤ (µµ)")]
+    public float verticalAngleOffset;              // ìˆ˜ì§ ë°œì‚¬ê° ì¡°ì •ê°’
+    [Tooltip("ìˆ˜í‰ ë°©í–¥ ë°œì‚¬ê° ì¡°ì • (ë„)")]
     [Range(-45f, 45f)]
-    public float horizontalAngleOffset;            // ¼öÆò ¹ß»ç°¢ Á¶Á¤°ª
-    [Tooltip("°øÀÇ ÃÊ±â ZÃà È¸Àü °¢µµ (µµ)")]
+    public float horizontalAngleOffset;            // ìˆ˜í‰ ë°œì‚¬ê° ì¡°ì •ê°’
+    [Tooltip("ê³µì˜ ì´ˆê¸° Zì¶• íšŒì „ ê°ë„ (ë„)")]
     [Range(0f, 360f)]
-    public float initialRotationAngleZ;            // °øÀÇ ÃÊ±â ZÃà È¸Àü °¢µµ
-    [Tooltip("°øÀÇ ÃÊ±â XÃà È¸Àü °¢µµ (µµ)")]
-    public float initialRotationAngleX;            // °øÀÇ ÃÊ±â XÃà È¸Àü °¢µµ
+    public float initialRotationAngleZ;            // ê³µì˜ ì´ˆê¸° Zì¶• íšŒì „ ê°ë„
+    [Tooltip("ê³µì˜ ì´ˆê¸° Xì¶• íšŒì „ ê°ë„ (ë„)")]
+    public float initialRotationAngleX;            // ê³µì˜ ì´ˆê¸° Xì¶• íšŒì „ ê°ë„
 
-    [Header("Å¸ÀÌ¹Ö ¼³Á¤")]
-    [Tooltip("¹ß»ç ÈÄ °¨¼Ó ½ÃÀÛ±îÁöÀÇ ´ë±â ½Ã°£ (ÃÊ)")]
+    [Header("íƒ€ì´ë° ì„¤ì •")]
+    [Tooltip("ë°œì‚¬ í›„ ê°ì† ì‹œì‘ê¹Œì§€ì˜ ëŒ€ê¸° ì‹œê°„ (ì´ˆ)")]
     [Range(0f, 5f)]
-    public float brakingDelay;                     // °¨¼Ó ½ÃÀÛ Àü ´ë±â ½Ã°£
+    public float brakingDelay;                     // ê°ì† ì‹œì‘ ì „ ëŒ€ê¸° ì‹œê°„
       //
-    [Header("¹°¸® È¿°ú")]
-    [Tooltip("°ø±â ÀúÇ× »ó¼ö")]
-    public float airResistanceConstant = 0.02f;    // °ø±â ÀúÇ× °è¼ö
-    [Tooltip("¸¶±×´©½º È¿°ú »ó¼ö")]
-    public float magnusEffectConstant = 0.007f;    // ¸¶±×´©½º È¿°ú °è¼ö
-    [Tooltip("¼öÆò È¸Àü ¹èÀ²")]
-    public float horizontalRotationMultiplier = 3; // ¼öÆò È¸Àü ¹èÀ²
+    [Header("ë¬¼ë¦¬ íš¨ê³¼")]
+    [Tooltip("ê³µê¸° ì €í•­ ìƒìˆ˜")]
+    public float airResistanceConstant = 0.02f;    // ê³µê¸° ì €í•­ ê³„ìˆ˜
+    [Tooltip("ë§ˆê·¸ëˆ„ìŠ¤ íš¨ê³¼ ìƒìˆ˜")]
+    public float magnusEffectConstant = 0.007f;    // ë§ˆê·¸ëˆ„ìŠ¤ íš¨ê³¼ ê³„ìˆ˜
+    [Tooltip("ìˆ˜í‰ íšŒì „ ë°°ìœ¨")]
+    public float horizontalRotationMultiplier = 3; // ìˆ˜í‰ íšŒì „ ë°°ìœ¨
 
-    [Header("»óÅÂ")]
-    [Tooltip("°øÀÌ ¹°Ã¼¿Í Ãæµ¹Çß´ÂÁö ¿©ºÎ")]
-    public bool hasCollided = false;               // Ãæµ¹ ¹ß»ı ¿©ºÎ
+    [Header("ìƒíƒœ")]
+    [Tooltip("ê³µì´ ë¬¼ì²´ì™€ ì¶©ëŒí–ˆëŠ”ì§€ ì—¬ë¶€")]
+    public bool hasCollided = false;               // ì¶©ëŒ ë°œìƒ ì—¬ë¶€
 
-    [Header("½ºÆ®¶óÀÌÅ©/º¼ ÆÇÁ¤")]
-    private ABSScoreDetector scoreDetector;        // Á¡¼ö ÆÇÁ¤±â ÂüÁ¶
-    private bool isBallLaunched = false;           // °ø ¹ß»ç ¿©ºÎ
+    [Header("ìŠ¤íŠ¸ë¼ì´í¬/ë³¼ íŒì •")]
+    private ABSScoreDetector scoreDetector;        // ì ìˆ˜ íŒì •ê¸° ì°¸ì¡°
+    private bool isBallLaunched = false;           // ê³µ ë°œì‚¬ ì—¬ë¶€
 
-    [Header("¿Àµğ¿À ¼³Á¤")]
-    public AudioSource whooshClip;                 // È× ¼Ò¸® ¿Àµğ¿À ¼Ò½º
+    [Header("ì˜¤ë””ì˜¤ ì„¤ì •")]
+    public AudioSource whooshClip;                 // íœ™ ì†Œë¦¬ ì˜¤ë””ì˜¤ ì†ŒìŠ¤
 
-    [Header("º¼·ı ¼³Á¤")]
-    [Tooltip("ÃÖ¼Ò º¼·ı")]
-    public float minVolume = 0.5f;                 // ÃÖ¼Ò º¼·ı
-    [Tooltip("ÃÖ´ë º¼·ı")]
-    public float maxVolume = 1.5f;                 // ÃÖ´ë º¼·ı
-    [Tooltip("º¼·ı °î¼± °­µµ")]
-    public float volumeCurve = 2.0f;               // °î¼± °­µµ (1.0 = ¼±Çü, >1.0 = Áö¼öÀû Áõ°¡)
+    [Header("ë³¼ë¥¨ ì„¤ì •")]
+    [Tooltip("ìµœì†Œ ë³¼ë¥¨")]
+    public float minVolume = 0.5f;                 // ìµœì†Œ ë³¼ë¥¨
+    [Tooltip("ìµœëŒ€ ë³¼ë¥¨")]
+    public float maxVolume = 1.5f;                 // ìµœëŒ€ ë³¼ë¥¨
+    [Tooltip("ë³¼ë¥¨ ê³¡ì„  ê°•ë„")]
+    public float volumeCurve = 2.0f;               // ê³¡ì„  ê°•ë„ (1.0 = ì„ í˜•, >1.0 = ì§€ìˆ˜ì  ì¦ê°€)
 
-    [Header("´øÁö±â ÆÄ¿ö ¼³Á¤")]
+    [Header("ë˜ì§€ê¸° íŒŒì›Œ ì„¤ì •")]
     [Range(70f, 170f)]
-    [Tooltip("ÃÖ¼Ò ´øÁö±â ÆÄ¿ö")]
-    public float minThrowPower = 70f;              // ÃÖ¼Ò throwPower
-    [Tooltip("ÃÖ´ë ´øÁö±â ÆÄ¿ö")]
-    public float maxThrowPower = 170f;             // ÃÖ´ë throwPower
+    [Tooltip("ìµœì†Œ ë˜ì§€ê¸° íŒŒì›Œ")]
+    public float minThrowPower = 70f;              // ìµœì†Œ throwPower
+    [Tooltip("ìµœëŒ€ ë˜ì§€ê¸° íŒŒì›Œ")]
+    public float maxThrowPower = 170f;             // ìµœëŒ€ throwPower
 
-    [Header("È¸ÀüÃà ±âÁî¸ğ ¼³Á¤")]
-    [Tooltip("È¸ÀüÃà ±âÁî¸ğ È°¼ºÈ­ ¿©ºÎ")]
-    public bool showRotationAxisGizmo = true;      // È¸ÀüÃà ±âÁî¸ğ Ç¥½Ã ¿©ºÎ
-    [Tooltip("È¸ÀüÃà ±âÁî¸ğ ±æÀÌ")]
-    public float gizmoLength = 2.0f;               // ±âÁî¸ğ ¶óÀÎ ±æÀÌ
-    [Tooltip("È¸ÀüÃà ±âÁî¸ğ »ö»ó")]
-    public Color rotationAxisColor = Color.red;    // È¸ÀüÃà »ö»ó
+    [Header("íšŒì „ì¶• ê¸°ì¦ˆëª¨ ì„¤ì •")]
+    [Tooltip("íšŒì „ì¶• ê¸°ì¦ˆëª¨ í™œì„±í™” ì—¬ë¶€")]
+    public bool showRotationAxisGizmo = true;      // íšŒì „ì¶• ê¸°ì¦ˆëª¨ í‘œì‹œ ì—¬ë¶€
+    [Tooltip("íšŒì „ì¶• ê¸°ì¦ˆëª¨ ê¸¸ì´")]
+    public float gizmoLength = 2.0f;               // ê¸°ì¦ˆëª¨ ë¼ì¸ ê¸¸ì´
+    [Tooltip("íšŒì „ì¶• ê¸°ì¦ˆëª¨ ìƒ‰ìƒ")]
+    public Color rotationAxisColor = Color.red;    // íšŒì „ì¶• ìƒ‰ìƒ
 
-    [Header("Ãæµ¹ ½Ã ¹°¸® Ã³¸®")]
-    [Tooltip("Ãæµ¹ ½Ã °¨¼è °è¼ö")]
-    [SerializeField] private float collisionDampingFactor = 0.5f; // Ãæµ¹ ½Ã °¨¼è °è¼ö
-    [Tooltip("Å¸°İ ÈÄ ÃÖ¼Ò ¼Óµµ")]
-    [SerializeField] private float minBallVelocityAfterHit = 2.0f; // ÃÖ¼Ò ¼Óµµ À¯Áö (³Ê¹« ´À¸®°Ô ¶³¾îÁöÁö ¾Êµµ·Ï)
-    [Tooltip("Å¸°İ ÈÄ Áß·Â ¹èÀ²")]
-    [SerializeField] private float gravityMultiplierAfterHit = 1.5f; // Å¸°İ ÈÄ Áß·Â ¹èÀ²
+    [Header("ì¶©ëŒ ì‹œ ë¬¼ë¦¬ ì²˜ë¦¬")]
+    [Tooltip("ì¶©ëŒ ì‹œ ê°ì‡  ê³„ìˆ˜")]
+    [SerializeField] private float collisionDampingFactor = 0.5f; // ì¶©ëŒ ì‹œ ê°ì‡  ê³„ìˆ˜
+    [Tooltip("íƒ€ê²© í›„ ìµœì†Œ ì†ë„")]
+    [SerializeField] private float minBallVelocityAfterHit = 2.0f; // ìµœì†Œ ì†ë„ ìœ ì§€ (ë„ˆë¬´ ëŠë¦¬ê²Œ ë–¨ì–´ì§€ì§€ ì•Šë„ë¡)
+    [Tooltip("íƒ€ê²© í›„ ì¤‘ë ¥ ë°°ìœ¨")]
+    [SerializeField] private float gravityMultiplierAfterHit = 1.5f; // íƒ€ê²© í›„ ì¤‘ë ¥ ë°°ìœ¨
 
-    [Tooltip("ÃÖ´ë ¼öÁ÷ ¼Óµµ")]
-    [SerializeField] private float maxVerticalVelocity = 20f; // ÃÖ´ë ¼öÁ÷ ¼Óµµ
+    [Tooltip("ìµœëŒ€ ìˆ˜ì§ ì†ë„")]
+    [SerializeField] private float maxVerticalVelocity = 20f; // ìµœëŒ€ ìˆ˜ì§ ì†ë„
 
-    // Ãæµ¹ ÀÌº¥Æ®°¡ ¿©·¯¹ø È£ÃâµÇ´Â °ÍÀ» ¹æÁöÇÏ±â À§ÇÑ ÇÊµå
+    // ì¶©ëŒ ì´ë²¤íŠ¸ê°€ ì—¬ëŸ¬ë²ˆ í˜¸ì¶œë˜ëŠ” ê²ƒì„ ë°©ì§€í•˜ê¸° ìœ„í•œ í•„ë“œ
     private float lastCollisionTime = 0f;
-    [Tooltip("Ãæµ¹ Äğ´Ù¿î ½Ã°£")]
-    private float collisionCooldown = 0.1f; // Ãæµ¹ Äğ´Ù¿î ½Ã°£ (ÃÊ)
+    [Tooltip("ì¶©ëŒ ì¿¨ë‹¤ìš´ ì‹œê°„")]
+    private float collisionCooldown = 0.1f; // ì¶©ëŒ ì¿¨ë‹¤ìš´ ì‹œê°„ (ì´ˆ)
 
-    // ¼Óµµ °è»êÀ» À§ÇÑ º¯¼ö
+    // ì†ë„ ê³„ì‚°ì„ ìœ„í•œ ë³€ìˆ˜
     private float startTime;
-    private const float TARGET_DISTANCE = 18.44f; // ¸ñÇ¥ °Å¸®(¹ÌÅÍ)
+    private const float TARGET_DISTANCE = 18.44f; // ëª©í‘œ ê±°ë¦¬(ë¯¸í„°)
 
-    [Tooltip("µğ¹ö±× ·Î±× Ãâ·Â ¿©ºÎ")]
+    [Tooltip("ë””ë²„ê·¸ ë¡œê·¸ ì¶œë ¥ ì—¬ë¶€")]
     public bool debugMode = false;
 
     [Header("Distance Calculation")]
     public bool hasLanded = false;
     public float actualDistance = 0f;
     public Vector3 launchPosition;
-    public bool isCalculatingDistance = false; // private¿¡¼­ publicÀ¸·Î º¯°æ
+    public bool isCalculatingDistance = false; // privateì—ì„œ publicìœ¼ë¡œ ë³€ê²½
     private Vector3 lastPosition;
-    private float groundY = 0.01f; // Áö¸é ³ôÀÌ (ÇÊ¿ä¿¡ µû¶ó Á¶Á¤)
+    private float groundY = 0.01f; // ì§€ë©´ ë†’ì´ (í•„ìš”ì— ë”°ë¼ ì¡°ì •)
 
     /**
-     * ¸Å ÇÁ·¹ÀÓ¸¶´Ù È£ÃâµÇ´Â ¾÷µ¥ÀÌÆ® ÇÔ¼ö
-     * ¿Àµğ¿À º¼·ıÀ» ¾÷µ¥ÀÌÆ®ÇÏ°í Ãæµ¹ ÀÌÈÄÀÇ Ãß°¡ ¹°¸® È¿°ú¸¦ Àû¿ëÇÕ´Ï´Ù.
+     * ë§¤ í”„ë ˆì„ë§ˆë‹¤ í˜¸ì¶œë˜ëŠ” ì—…ë°ì´íŠ¸ í•¨ìˆ˜
+     * ì˜¤ë””ì˜¤ ë³¼ë¥¨ì„ ì—…ë°ì´íŠ¸í•˜ê³  ì¶©ëŒ ì´í›„ì˜ ì¶”ê°€ ë¬¼ë¦¬ íš¨ê³¼ë¥¼ ì ìš©í•©ë‹ˆë‹¤.
      */
     private void Update()
     {
         UpdateAudioVolume();
 
-        // Ãæµ¹ ÀÌÈÄ Ãß°¡ÀûÀÎ Áß·Â ¿µÇâ Àû¿ë
+        // ì¶©ëŒ ì´í›„ ì¶”ê°€ì ì¸ ì¤‘ë ¥ ì˜í–¥ ì ìš©
         if (hasCollided && ballRigidbody != null)
         {
-            // Å¸°İ ÈÄ Ãß°¡ Áß·Â Àû¿ë
+            // íƒ€ê²© í›„ ì¶”ê°€ ì¤‘ë ¥ ì ìš©
             ballRigidbody.AddForce(Vector3.down * Physics.gravity.magnitude * gravityMultiplierAfterHit, ForceMode.Acceleration);
 
-            // ³Ê¹« ´À¸° °øÀº ÃÖ¼Ò ¼Óµµ À¯Áö (°øÀÌ ¸ØÃç¼­ ¶³¾îÁö´Â °Í ¹æÁö)
+            // ë„ˆë¬´ ëŠë¦° ê³µì€ ìµœì†Œ ì†ë„ ìœ ì§€ (ê³µì´ ë©ˆì¶°ì„œ ë–¨ì–´ì§€ëŠ” ê²ƒ ë°©ì§€)
             if (ballRigidbody.velocity.magnitude < minBallVelocityAfterHit)
             {
-                // ÇöÀç ¹æÇâ À¯ÁöÇÏ¸é¼­ ÃÖ¼Ò ¼Óµµ Àû¿ë
+                // í˜„ì¬ ë°©í–¥ ìœ ì§€í•˜ë©´ì„œ ìµœì†Œ ì†ë„ ì ìš©
                 ballRigidbody.velocity = ballRigidbody.velocity.normalized * minBallVelocityAfterHit;
             }
         }
         if (hasCollided && !hasLanded && !isCalculatingDistance)
         {
-            // launchPositionÀÌ ¼³Á¤µÇÁö ¾Ê¾Ò´Ù¸é ¿øÁ¡À¸·Î ¼³Á¤
+            // launchPositionì´ ì„¤ì •ë˜ì§€ ì•Šì•˜ë‹¤ë©´ ì›ì ìœ¼ë¡œ ì„¤ì •
             if (launchPosition == Vector3.zero)
             {
-                launchPosition = Vector3.zero; // ¶Ç´Â ½ÇÁ¦ È¨ÇÃ·¹ÀÌÆ® À§Ä¡·Î ¼³Á¤
+                launchPosition = Vector3.zero; // ë˜ëŠ” ì‹¤ì œ í™ˆí”Œë ˆì´íŠ¸ ìœ„ì¹˜ë¡œ ì„¤ì •
             }
 
             isCalculatingDistance = true;
@@ -146,7 +146,7 @@ public class BallController : MonoBehaviour
             StartCoroutine(CalculateActualDistance());
         }
 
-        // µğ¹ö±ë¿ë: ÂøÁö ÈÄ ¹ß»ç ÁöÁ¡°ú ÂøÁö ÁöÁ¡ »çÀÌ¿¡ ¼± ±×¸®±â
+        // ë””ë²„ê¹…ìš©: ì°©ì§€ í›„ ë°œì‚¬ ì§€ì ê³¼ ì°©ì§€ ì§€ì  ì‚¬ì´ì— ì„  ê·¸ë¦¬ê¸°
         if (hasLanded)
         {
             Debug.DrawLine(launchPosition, new Vector3(transform.position.x, launchPosition.y, transform.position.z), Color.red);
@@ -154,10 +154,10 @@ public class BallController : MonoBehaviour
     }
 
     /**
-     * °ø ¼³Á¤À» Àû¿ëÇÏ´Â ¸Ş¼­µå
-     * ¿ÜºÎ¿¡¼­ ¹°¸® ¼³Á¤°ªÀ» ÀÏ°ı Àû¿ëÇÒ ¶§ »ç¿ëÇÕ´Ï´Ù.
+     * ê³µ ì„¤ì •ì„ ì ìš©í•˜ëŠ” ë©”ì„œë“œ
+     * ì™¸ë¶€ì—ì„œ ë¬¼ë¦¬ ì„¤ì •ê°’ì„ ì¼ê´„ ì ìš©í•  ë•Œ ì‚¬ìš©í•©ë‹ˆë‹¤.
      * 
-     * @param settings Àû¿ëÇÒ °ø ¼³Á¤ °ª
+     * @param settings ì ìš©í•  ê³µ ì„¤ì • ê°’
      */
     public void SetBallSettings(BallSettings settings)
     {
@@ -172,9 +172,9 @@ public class BallController : MonoBehaviour
     }
 
     /**
-     * ±¸Á¾ À¯ÇüÀ» ¼³Á¤ÇÏ´Â ¸Ş¼­µå
+     * êµ¬ì¢… ìœ í˜•ì„ ì„¤ì •í•˜ëŠ” ë©”ì„œë“œ
      * 
-     * @param type ¼³Á¤ÇÒ ±¸Á¾ À¯Çü ¹®ÀÚ¿­
+     * @param type ì„¤ì •í•  êµ¬ì¢… ìœ í˜• ë¬¸ìì—´
      */
     public void SetPitchType(string type)
     {
@@ -182,32 +182,32 @@ public class BallController : MonoBehaviour
 
         if (debugMode)
         {
-            Debug.Log($"°ø ±¸Á¾ ¼³Á¤: {pitchTypeName}");
+            Debug.Log($"ê³µ êµ¬ì¢… ì„¤ì •: {pitchTypeName}");
         }
     }
 
     /**
-     * ¿Àµğ¿À º¼·ıÀ» ¾÷µ¥ÀÌÆ®ÇÏ´Â ¸Ş¼­µå
-     * ÆÄ¿ö¿¡ µû¶ó º¼·ıÀ» Á¶ÀıÇÕ´Ï´Ù.
+     * ì˜¤ë””ì˜¤ ë³¼ë¥¨ì„ ì—…ë°ì´íŠ¸í•˜ëŠ” ë©”ì„œë“œ
+     * íŒŒì›Œì— ë”°ë¼ ë³¼ë¥¨ì„ ì¡°ì ˆí•©ë‹ˆë‹¤.
      */
     private void UpdateAudioVolume()
     {
         if (whooshClip == null) return;
 
-        // throwPower ¹üÀ§ Á¤±ÔÈ­ (0~1)
+        // throwPower ë²”ìœ„ ì •ê·œí™” (0~1)
         float powerFactor = Mathf.Clamp01((initialForce - minThrowPower) / (maxThrowPower - minThrowPower));
 
-        // °î¼± Àû¿ë
+        // ê³¡ì„  ì ìš©
         float volume = Mathf.Lerp(minVolume, maxVolume, Mathf.Pow(powerFactor, volumeCurve));
 
-        // º¼·ı ¼³Á¤
+        // ë³¼ë¥¨ ì„¤ì •
         whooshClip.volume = volume;
     }
 
     /**
-     * Á¡¼ö ÆÇÁ¤±â¸¦ ¼³Á¤ÇÏ´Â ¸Ş¼­µå (¿ÜºÎ¿¡¼­ È£ÃâµÊ)
+     * ì ìˆ˜ íŒì •ê¸°ë¥¼ ì„¤ì •í•˜ëŠ” ë©”ì„œë“œ (ì™¸ë¶€ì—ì„œ í˜¸ì¶œë¨)
      * 
-     * @param detector ¼³Á¤ÇÒ Á¡¼ö ÆÇÁ¤±â °´Ã¼
+     * @param detector ì„¤ì •í•  ì ìˆ˜ íŒì •ê¸° ê°ì²´
      */
     private void SetScoreDetector(ABSScoreDetector detector)
     {
@@ -215,11 +215,11 @@ public class BallController : MonoBehaviour
     }
 
     /**
-     * ¿ÜºÎ ½ºÅ©¸³Æ®¿¡¼­ ¹ß»ç ¹æÇâÀ» ¼³Á¤ÇÏ´Â ¸Ş¼­µå
-     * ½ÃÀÛ À§Ä¡¿Í ¸ñÇ¥ À§Ä¡¸¦ ±â¹İÀ¸·Î ¹æÇâÀ» °è»êÇÕ´Ï´Ù.
+     * ì™¸ë¶€ ìŠ¤í¬ë¦½íŠ¸ì—ì„œ ë°œì‚¬ ë°©í–¥ì„ ì„¤ì •í•˜ëŠ” ë©”ì„œë“œ
+     * ì‹œì‘ ìœ„ì¹˜ì™€ ëª©í‘œ ìœ„ì¹˜ë¥¼ ê¸°ë°˜ìœ¼ë¡œ ë°©í–¥ì„ ê³„ì‚°í•©ë‹ˆë‹¤.
      * 
-     * @param startPosition ½ÃÀÛ À§Ä¡
-     * @param targetPosition ¸ñÇ¥ À§Ä¡
+     * @param startPosition ì‹œì‘ ìœ„ì¹˜
+     * @param targetPosition ëª©í‘œ ìœ„ì¹˜
      */
     public void CalculateDirection(Vector3 startPosition, Vector3 targetPosition)
     {
@@ -229,62 +229,62 @@ public class BallController : MonoBehaviour
         {
             float distance = Vector3.Distance(startPosition, targetPosition);
             Debug.Log(string.Format(
-                "¹ß»ç ¹æÇâ °è»ê: ½ÃÀÛ={0}, ¸ñÇ¥={1}, ¹æÇâ={2}, °Å¸®={3:F2}m",
+                "ë°œì‚¬ ë°©í–¥ ê³„ì‚°: ì‹œì‘={0}, ëª©í‘œ={1}, ë°©í–¥={2}, ê±°ë¦¬={3:F2}m",
                 startPosition, targetPosition, launchDirection, distance));
         }
     }
 
     /**
-     * °øÀ» ¹ß»çÇÏ´Â ¸Ş¼­µå
-     * ¿ÜºÎ ½ºÅ©¸³Æ®¿¡¼­ ÀûÀıÇÑ ½ÃÁ¡¿¡ È£ÃâµË´Ï´Ù.
+     * ê³µì„ ë°œì‚¬í•˜ëŠ” ë©”ì„œë“œ
+     * ì™¸ë¶€ ìŠ¤í¬ë¦½íŠ¸ì—ì„œ ì ì ˆí•œ ì‹œì ì— í˜¸ì¶œë©ë‹ˆë‹¤.
      */
     public void LaunchBall()
     {
-        // Rigidbody ÄÄÆ÷³ÍÆ® È®ÀÎ
+        // Rigidbody ì»´í¬ë„ŒíŠ¸ í™•ì¸
         if (ballRigidbody == null)
         {
             ballRigidbody = GetComponent<Rigidbody>();
-            ballRigidbody.maxAngularVelocity = 4000;  // ÃÖ´ë °¢¼Óµµ ¼³Á¤
+            ballRigidbody.maxAngularVelocity = 4000;  // ìµœëŒ€ ê°ì†ë„ ì„¤ì •
         }
 
-        // ¹ß»ç°¢ Á¶Á¤
+        // ë°œì‚¬ê° ì¡°ì •
         Quaternion angleAdjustment = Quaternion.Euler(verticalAngleOffset, 0, horizontalAngleOffset);
         Vector3 adjustedDirection = angleAdjustment * launchDirection;
 
-        // ¹ß»ç Èû Á¤±ÔÈ­ ¹× Àû¿ë
+        // ë°œì‚¬ í˜ ì •ê·œí™” ë° ì ìš©
         float normalizedForce = 0.043306f * initialForce - 0.102461f;
         ballRigidbody.AddForce(adjustedDirection * normalizedForce, ForceMode.Impulse);
 
-        // ÃÊ±â È¸Àü ¼³Á¤
+        // ì´ˆê¸° íšŒì „ ì„¤ì •
         ballRigidbody.rotation = Quaternion.Euler(initialRotationAngleX, 0, initialRotationAngleZ);
 
-        // ÀÌÁ¦ °øÀÌ ¹ß»çµÇ¾úÀ½À» Ç¥½Ã
+        // ì´ì œ ê³µì´ ë°œì‚¬ë˜ì—ˆìŒì„ í‘œì‹œ
         isBallLaunched = true;
 
-        // ½ÃÀÛ ½Ã°£ ±â·Ï
+        // ì‹œì‘ ì‹œê°„ ê¸°ë¡
         startTime = Time.time;
 
-        // °¨¼Ó ÄÚ·çÆ¾ ½ÃÀÛ
+        // ê°ì† ì½”ë£¨í‹´ ì‹œì‘
         StartCoroutine(ApplyBrakingAfterDelay(brakingDelay));
 
-        // µğ¹ö±× ¸ğµåÀÏ ¶§¸¸ ·Î±× Ãâ·Â
+        // ë””ë²„ê·¸ ëª¨ë“œì¼ ë•Œë§Œ ë¡œê·¸ ì¶œë ¥
         if (debugMode)
         {
             Debug.Log(string.Format(
-                "°ø ¹ß»ç: ¹æÇâ={0}, Èû={1:F2}, ¼öÁ÷°¢={2}µµ, ¼öÆò°¢={3}µµ",
+                "ê³µ ë°œì‚¬: ë°©í–¥={0}, í˜={1:F2}, ìˆ˜ì§ê°={2}ë„, ìˆ˜í‰ê°={3}ë„",
                 adjustedDirection, normalizedForce, verticalAngleOffset, horizontalAngleOffset));
         }
     }
 
     /**
-     * ¼öµ¿À¸·Î °øÀ» ÃÊ±âÈ­ÇÏ´Â ¸Ş¼­µå
-     * ¿ÀºêÁ§Æ® »ı¼º ½Ã ÀÚµ¿À¸·Î È£ÃâµË´Ï´Ù.
+     * ìˆ˜ë™ìœ¼ë¡œ ê³µì„ ì´ˆê¸°í™”í•˜ëŠ” ë©”ì„œë“œ
+     * ì˜¤ë¸Œì íŠ¸ ìƒì„± ì‹œ ìë™ìœ¼ë¡œ í˜¸ì¶œë©ë‹ˆë‹¤.
      */
     private void Awake()
     {
         hasCollided = false;
 
-        // ¿ÀºêÁ§Æ® »ı¼º ½Ã ½ÃÀÛ ½Ã°£ ±â·Ï (¹ß»ç Àü¿¡µµ ½Ã°£ ÃøÁ¤)
+        // ì˜¤ë¸Œì íŠ¸ ìƒì„± ì‹œ ì‹œì‘ ì‹œê°„ ê¸°ë¡ (ë°œì‚¬ ì „ì—ë„ ì‹œê°„ ì¸¡ì •)
         startTime = Time.time;
 
         if (whooshClip != null)
@@ -294,14 +294,14 @@ public class BallController : MonoBehaviour
 
         if (debugMode)
         {
-            Debug.Log("Ball ¿ÀºêÁ§Æ® ÃÊ±âÈ­ ¿Ï·á");
+            Debug.Log("Ball ì˜¤ë¸Œì íŠ¸ ì´ˆê¸°í™” ì™„ë£Œ");
         }
     }
 
     /**
-     * ÁöÁ¤µÈ ½Ã°£ ÈÄ °¨¼ÓÀ» ½ÃÀÛÇÏ´Â ÄÚ·çÆ¾
+     * ì§€ì •ëœ ì‹œê°„ í›„ ê°ì†ì„ ì‹œì‘í•˜ëŠ” ì½”ë£¨í‹´
      * 
-     * @param delay °¨¼Ó ½ÃÀÛ Àü ´ë±â ½Ã°£(ÃÊ)
+     * @param delay ê°ì† ì‹œì‘ ì „ ëŒ€ê¸° ì‹œê°„(ì´ˆ)
      */
     IEnumerator ApplyBrakingAfterDelay(float delay)
     {
@@ -310,8 +310,8 @@ public class BallController : MonoBehaviour
     }
 
     /**
-     * °¨¼ÓÀ» Àû¿ëÇÏ´Â ¸Ş¼­µå
-     * È¸Àü·ÂÀ» Àû¿ëÇÏ¿© °øÀÇ ¼Óµµ¸¦ Á¦¾îÇÕ´Ï´Ù.
+     * ê°ì†ì„ ì ìš©í•˜ëŠ” ë©”ì„œë“œ
+     * íšŒì „ë ¥ì„ ì ìš©í•˜ì—¬ ê³µì˜ ì†ë„ë¥¼ ì œì–´í•©ë‹ˆë‹¤.
      */
     void ApplyBraking()
     {
@@ -326,24 +326,24 @@ public class BallController : MonoBehaviour
         if (debugMode)
         {
             Debug.Log(string.Format(
-                "°¨¼Ó È¸Àü·Â Àû¿ë: È¸Àü·Â={0}, ÇöÀç¼Óµµ={1:F2}m/s, ÇöÀç°¢¼Óµµ={2}",
+                "ê°ì† íšŒì „ë ¥ ì ìš©: íšŒì „ë ¥={0}, í˜„ì¬ì†ë„={1:F2}m/s, í˜„ì¬ê°ì†ë„={2}",
                 torque, ballRigidbody.velocity.magnitude, ballRigidbody.angularVelocity));
         }
     }
 
     /**
-     * ¹°¸® ¾÷µ¥ÀÌÆ® ¸Ş¼­µå
-     * °ø±â ÀúÇ×°ú ¸¶±×´©½º È¿°ú¸¦ Àû¿ëÇÕ´Ï´Ù.
+     * ë¬¼ë¦¬ ì—…ë°ì´íŠ¸ ë©”ì„œë“œ
+     * ê³µê¸° ì €í•­ê³¼ ë§ˆê·¸ëˆ„ìŠ¤ íš¨ê³¼ë¥¼ ì ìš©í•©ë‹ˆë‹¤.
      */
     void FixedUpdate()
     {
         if (!hasCollided)
         {
-            // Ãæµ¹ Àü¿¡´Â ¹°¸® È¿°ú Àû¿ë
+            // ì¶©ëŒ ì „ì—ëŠ” ë¬¼ë¦¬ íš¨ê³¼ ì ìš©
             ballRigidbody.AddForce(CalculateMagnusForce());
             ballRigidbody.AddForce(CalculateAirResistance());
 
-            // ¼öÁ÷ ¼Óµµ Á¦ÇÑ (³Ê¹« ºü¸£°Ô À§·Î ¿Ã¶ó°¡´Â °Í ¹æÁö)
+            // ìˆ˜ì§ ì†ë„ ì œí•œ (ë„ˆë¬´ ë¹ ë¥´ê²Œ ìœ„ë¡œ ì˜¬ë¼ê°€ëŠ” ê²ƒ ë°©ì§€)
             if (ballRigidbody.velocity.y > maxVerticalVelocity)
             {
                 Vector3 newVelocity = ballRigidbody.velocity;
@@ -353,17 +353,17 @@ public class BallController : MonoBehaviour
         }
         else
         {
-            // Ãæµ¹ ÈÄ¿¡´Â È¸Àü·Â Áß´Ü
+            // ì¶©ëŒ í›„ì—ëŠ” íšŒì „ë ¥ ì¤‘ë‹¨
             verticalRotationSpeed = 0;
             horizontalRotationSpeed = 0;
         }
     }
 
     /**
-     * °ø±â ÀúÇ×·ÂÀ» °è»êÇÏ´Â ¸Ş¼­µå
-     * ¼ÓµµÀÇ Á¦°ö¿¡ ºñ·ÊÇÏ´Â ÀúÇ×·ÂÀ» ¼Óµµ ¹İ´ë ¹æÇâÀ¸·Î ¹ß»ıÇÕ´Ï´Ù.
+     * ê³µê¸° ì €í•­ë ¥ì„ ê³„ì‚°í•˜ëŠ” ë©”ì„œë“œ
+     * ì†ë„ì˜ ì œê³±ì— ë¹„ë¡€í•˜ëŠ” ì €í•­ë ¥ì„ ì†ë„ ë°˜ëŒ€ ë°©í–¥ìœ¼ë¡œ ë°œìƒí•©ë‹ˆë‹¤.
      * 
-     * @return °è»êµÈ °ø±â ÀúÇ×·Â º¤ÅÍ
+     * @return ê³„ì‚°ëœ ê³µê¸° ì €í•­ë ¥ ë²¡í„°
      */
     private Vector3 CalculateAirResistance()
     {
@@ -372,10 +372,10 @@ public class BallController : MonoBehaviour
         float resistanceMagnitude = airResistanceConstant * Mathf.Pow(speed, 2f);
         Vector3 resistance = resistanceMagnitude * -direction;
 
-        if (debugMode && Time.frameCount % 30 == 0)  // 30ÇÁ·¹ÀÓ¸¶´Ù ÇÑ ¹ø¾¿¸¸ ·Î±× Ãâ·Â (³Ê¹« ¸¹Àº ·Î±× ¹æÁö)
+        if (debugMode && Time.frameCount % 30 == 0)  // 30í”„ë ˆì„ë§ˆë‹¤ í•œ ë²ˆì”©ë§Œ ë¡œê·¸ ì¶œë ¥ (ë„ˆë¬´ ë§ì€ ë¡œê·¸ ë°©ì§€)
         {
             Debug.Log(string.Format(
-                "°ø±â ÀúÇ×: ¼Óµµ={0:F2}m/s, ÀúÇ×Å©±â={1:F4}N, ÀúÇ×¹æÇâ={2}",
+                "ê³µê¸° ì €í•­: ì†ë„={0:F2}m/s, ì €í•­í¬ê¸°={1:F4}N, ì €í•­ë°©í–¥={2}",
                 speed, resistanceMagnitude, -direction));
         }
 
@@ -383,11 +383,11 @@ public class BallController : MonoBehaviour
     }
 
     /**
-     * ¸¶±×´©½º È¿°ú¸¦ °è»êÇÏ´Â ¸Ş¼­µå
-     * È¸ÀüÇÏ´Â °øÀÌ °ø±â Áß¿¡¼­ °æÇèÇÏ´Â ÈûÀ» ½Ã¹Ä·¹ÀÌ¼ÇÇÕ´Ï´Ù.
-     * ¼Óµµ º¤ÅÍ¿Í °¢¼Óµµ º¤ÅÍÀÇ ¿ÜÀûÀ¸·Î °è»êµË´Ï´Ù.
+     * ë§ˆê·¸ëˆ„ìŠ¤ íš¨ê³¼ë¥¼ ê³„ì‚°í•˜ëŠ” ë©”ì„œë“œ
+     * íšŒì „í•˜ëŠ” ê³µì´ ê³µê¸° ì¤‘ì—ì„œ ê²½í—˜í•˜ëŠ” í˜ì„ ì‹œë®¬ë ˆì´ì…˜í•©ë‹ˆë‹¤.
+     * ì†ë„ ë²¡í„°ì™€ ê°ì†ë„ ë²¡í„°ì˜ ì™¸ì ìœ¼ë¡œ ê³„ì‚°ë©ë‹ˆë‹¤.
      * 
-     * @return °è»êµÈ ¸¶±×´©½º Èû º¤ÅÍ
+     * @return ê³„ì‚°ëœ ë§ˆê·¸ëˆ„ìŠ¤ í˜ ë²¡í„°
      */
     private Vector3 CalculateMagnusForce()
     {
@@ -395,10 +395,10 @@ public class BallController : MonoBehaviour
         Vector3 angularVelocity = ballRigidbody.angularVelocity;
         Vector3 magnusForce = magnusEffectConstant * Vector3.Cross(velocity, angularVelocity);
 
-        if (debugMode && Time.frameCount % 30 == 0)  // 30ÇÁ·¹ÀÓ¸¶´Ù ÇÑ ¹ø¾¿¸¸ ·Î±× Ãâ·Â
+        if (debugMode && Time.frameCount % 30 == 0)  // 30í”„ë ˆì„ë§ˆë‹¤ í•œ ë²ˆì”©ë§Œ ë¡œê·¸ ì¶œë ¥
         {
             Debug.Log(string.Format(
-                "¸¶±×´©½º È¿°ú: ¼Óµµ={0:F2}m/s, °¢¼Óµµ={1:F2}rad/s, Èû={2:F4}N",
+                "ë§ˆê·¸ëˆ„ìŠ¤ íš¨ê³¼: ì†ë„={0:F2}m/s, ê°ì†ë„={1:F2}rad/s, í˜={2:F4}N",
                 velocity.magnitude, angularVelocity.magnitude, magnusForce.magnitude));
         }
 
@@ -406,91 +406,91 @@ public class BallController : MonoBehaviour
     }
 
     /**
-     * Ãæµ¹ °¨Áö ¸Ş¼­µå - °³¼±µÈ ¹öÀü
-     * °øÀÇ Ãæµ¹ Ã³¸® ¹× Á¡¼ö ÆÇÁ¤À» ¼öÇàÇÕ´Ï´Ù.
+     * ì¶©ëŒ ê°ì§€ ë©”ì„œë“œ - ê°œì„ ëœ ë²„ì „
+     * ê³µì˜ ì¶©ëŒ ì²˜ë¦¬ ë° ì ìˆ˜ íŒì •ì„ ìˆ˜í–‰í•©ë‹ˆë‹¤.
      * 
-     * @param collision Ãæµ¹ Á¤º¸
+     * @param collision ì¶©ëŒ ì •ë³´
      */
     private void OnCollisionEnter(Collision collision)
     {
 
-        // ÀÌ¹Ì Ãæµ¹ »óÅÂÀÌ°Å³ª ¾ÆÁ÷ ¹ß»çµÇÁö ¾ÊÀº °æ¿ì ¶Ç´Â ³Ê¹« ºü¸¥ ¿¬¼Ó Ãæµ¹ÀÎ °æ¿ì ¹«½Ã
+        // ì´ë¯¸ ì¶©ëŒ ìƒíƒœì´ê±°ë‚˜ ì•„ì§ ë°œì‚¬ë˜ì§€ ì•Šì€ ê²½ìš° ë˜ëŠ” ë„ˆë¬´ ë¹ ë¥¸ ì—°ì† ì¶©ëŒì¸ ê²½ìš° ë¬´ì‹œ
         if (hasCollided || !isBallLaunched || (Time.time - lastCollisionTime < collisionCooldown))
             return;
 
-        // Ãæµ¹ ½Ã°£ ±â·Ï
+        // ì¶©ëŒ ì‹œê°„ ê¸°ë¡
         lastCollisionTime = Time.time;
 
-        // Ãæµ¹ ¹ß»ı Ç¥½Ã
+        // ì¶©ëŒ ë°œìƒ í‘œì‹œ
         hasCollided = true;
 
-        // ¼Óµµ °è»ê ¹× Ãâ·Â (¹İÈ¯°ªÀº km/h ´ÜÀ§ ¼Óµµ)
+        // ì†ë„ ê³„ì‚° ë° ì¶œë ¥ (ë°˜í™˜ê°’ì€ km/h ë‹¨ìœ„ ì†ë„)
         float finalSpeed = CalculateSpeed();
 
-        // µğ¹ö±× ¸ğµåÀÏ ¶§ Ãæµ¹ Á¤º¸ Ãâ·Â
+        // ë””ë²„ê·¸ ëª¨ë“œì¼ ë•Œ ì¶©ëŒ ì •ë³´ ì¶œë ¥
         if (debugMode)
         {
             string colliderName = collision.gameObject.name;
             string colliderTag = collision.gameObject.tag;
 
             Debug.Log(string.Format(
-                "°ø Ãæµ¹ ¹ß»ı: Ãæµ¹Ã¼={0}(ÅÂ±×:{1}), ÃÖÁ¾¼Óµµ={2:F2}km/h, Ãæµ¹ À§Ä¡={3}",
+                "ê³µ ì¶©ëŒ ë°œìƒ: ì¶©ëŒì²´={0}(íƒœê·¸:{1}), ìµœì¢…ì†ë„={2:F2}km/h, ì¶©ëŒ ìœ„ì¹˜={3}",
                 colliderName,
                 colliderTag,
                 finalSpeed,
                 collision.contacts[0].point));
         }
 
-        // ¾À¿¡¼­ ScoreDetector Ã£±â (ÇÁ¸®ÆÕ¿¡¼­ Á÷Á¢ ÂüÁ¶ÇÒ ¼ö ¾øÀ¸¹Ç·Î)
+        // ì”¬ì—ì„œ ScoreDetector ì°¾ê¸° (í”„ë¦¬íŒ¹ì—ì„œ ì§ì ‘ ì°¸ì¡°í•  ìˆ˜ ì—†ìœ¼ë¯€ë¡œ)
         ABSScoreDetector scoreDetector = FindObjectOfType<ABSScoreDetector>();
 
-        // Á¡¼ö °¨Áö±â°¡ ÀÖ´Â °æ¿ì
+        // ì ìˆ˜ ê°ì§€ê¸°ê°€ ìˆëŠ” ê²½ìš°
         if (scoreDetector != null)
         {
-            // Bat ¿ÀºêÁ§Æ®¿Í Ãæµ¹ÇÑ °æ¿ì - Å¸°İ Ã³¸®
+            // Bat ì˜¤ë¸Œì íŠ¸ì™€ ì¶©ëŒí•œ ê²½ìš° - íƒ€ê²© ì²˜ë¦¬
             if (collision.gameObject.CompareTag("Bat"))
             {
-                // Ãæµ¹ ¼Óµµ °è»ê ¹× °¨¼è Àû¿ë
+                // ì¶©ëŒ ì†ë„ ê³„ì‚° ë° ê°ì‡  ì ìš©
                 Vector3 reflectedVelocity = Vector3.Reflect(ballRigidbody.velocity, collision.contacts[0].normal);
 
-                // Ãæµ¹ ÁöÁ¡ ¹ı¼±¿¡ µû¸¥ ¹İ»ç °¢µµ Á¶Á¤
+                // ì¶©ëŒ ì§€ì  ë²•ì„ ì— ë”°ë¥¸ ë°˜ì‚¬ ê°ë„ ì¡°ì •
                 reflectedVelocity = reflectedVelocity * collisionDampingFactor;
 
-                // ÃÖ¼Ò ¼Óµµ º¸Àå (Á¤Áö ¹æÁö)
+                // ìµœì†Œ ì†ë„ ë³´ì¥ (ì •ì§€ ë°©ì§€)
                 if (reflectedVelocity.magnitude < minBallVelocityAfterHit)
                 {
                     reflectedVelocity = reflectedVelocity.normalized * minBallVelocityAfterHit;
                 }
 
-                // ¼öÁ÷ ¼Óµµ Á¦ÇÑ
+                // ìˆ˜ì§ ì†ë„ ì œí•œ
                 if (reflectedVelocity.y > maxVerticalVelocity)
                 {
                     reflectedVelocity.y = maxVerticalVelocity;
                 }
 
-                // ¼Óµµ Àû¿ë
+                // ì†ë„ ì ìš©
                 ballRigidbody.velocity = reflectedVelocity;
 
                 if (debugMode)
                 {
                     Debug.Log(string.Format(
-                        "Å¸°İ ÈÄ ¹İ»ç: ¿ø·¡¼Óµµ={0}, ¹İ»ç¼Óµµ={1}, °¨¼è°è¼ö={2}",
+                        "íƒ€ê²© í›„ ë°˜ì‚¬: ì›ë˜ì†ë„={0}, ë°˜ì‚¬ì†ë„={1}, ê°ì‡ ê³„ìˆ˜={2}",
                         ballRigidbody.velocity.magnitude,
                         reflectedVelocity.magnitude,
                         collisionDampingFactor));
                 }
 
-                // Å¸°İ ÀÌº¥Æ® ¾Ë¸²
+                // íƒ€ê²© ì´ë²¤íŠ¸ ì•Œë¦¼
                 scoreDetector.OnBallHit(gameObject);
             }
             else
             {
-                // ±âÅ¸ ¿ÀºêÁ§Æ®¿Í Ãæµ¹ÇÑ °æ¿ì Á¡¼ö ÆÇÁ¤ ¿äÃ»
+                // ê¸°íƒ€ ì˜¤ë¸Œì íŠ¸ì™€ ì¶©ëŒí•œ ê²½ìš° ì ìˆ˜ íŒì • ìš”ì²­
                 scoreDetector.CheckFinalScore(gameObject);
             }
         }
 
-        // È¿°úÀ½ ÁßÁö
+        // íš¨ê³¼ìŒ ì¤‘ì§€
         if (whooshClip != null)
         {
             whooshClip.Stop();
@@ -498,59 +498,59 @@ public class BallController : MonoBehaviour
     }
 
     /**
-     * °£´ÜÇÑ ¼Óµµ °è»ê ¹× Ãâ·Â ¸Ş¼­µå
-     * ½Ã°£°ú °Å¸®¸¦ ±â¹İÀ¸·Î Æò±Õ ¼Óµµ¸¦ °è»êÇÕ´Ï´Ù.
+     * ê°„ë‹¨í•œ ì†ë„ ê³„ì‚° ë° ì¶œë ¥ ë©”ì„œë“œ
+     * ì‹œê°„ê³¼ ê±°ë¦¬ë¥¼ ê¸°ë°˜ìœ¼ë¡œ í‰ê·  ì†ë„ë¥¼ ê³„ì‚°í•©ë‹ˆë‹¤.
      * 
-     * @return °è»êµÈ Æò±Õ ¼Óµµ (km/h)
+     * @return ê³„ì‚°ëœ í‰ê·  ì†ë„ (km/h)
      */
     public float CalculateSpeed()
     {
-        // °æ°ú ½Ã°£ °è»ê
+        // ê²½ê³¼ ì‹œê°„ ê³„ì‚°
         float travelTime = Time.time - startTime;
 
-        // ¸ñÇ¥ °Å¸®(18.44¹ÌÅÍ)¸¦ ±âÁØÀ¸·Î Æò±Õ ¼Óµµ °è»ê (¹ÌÅÍ/ÃÊ)
+        // ëª©í‘œ ê±°ë¦¬(18.44ë¯¸í„°)ë¥¼ ê¸°ì¤€ìœ¼ë¡œ í‰ê·  ì†ë„ ê³„ì‚° (ë¯¸í„°/ì´ˆ)
         float averageSpeed = TARGET_DISTANCE / travelTime;
 
-        // µğ¹ö±× ¸ğµåÀÏ ¶§¸¸ ·Î±× Ãâ·Â
+        // ë””ë²„ê·¸ ëª¨ë“œì¼ ë•Œë§Œ ë¡œê·¸ ì¶œë ¥
         if (debugMode)
         {
             Debug.Log(string.Format(
-                "°ø ¼Óµµ Á¤º¸: °Å¸®={0}m, ÀÌµ¿½Ã°£={1:F2}ÃÊ, Æò±Õ¼Óµµ={2:F2}km/h",
+                "ê³µ ì†ë„ ì •ë³´: ê±°ë¦¬={0}m, ì´ë™ì‹œê°„={1:F2}ì´ˆ, í‰ê· ì†ë„={2:F2}km/h",
                 TARGET_DISTANCE, travelTime, averageSpeed * 3.6f));
         }
 
-        // ¼Óµµ ¹İÈ¯ (km/h)
+        // ì†ë„ ë°˜í™˜ (km/h)
         return averageSpeed * 3.6f;
     }
 
     private IEnumerator CalculateActualDistance()
     {
-        // °øÀÌ Å¸°İµÈ ÈÄ ÃÖ°íÁ¡À» Áö³ª ³»·Á¿À´Â °ÍÀ» ±â´Ù¸²
+        // ê³µì´ íƒ€ê²©ëœ í›„ ìµœê³ ì ì„ ì§€ë‚˜ ë‚´ë ¤ì˜¤ëŠ” ê²ƒì„ ê¸°ë‹¤ë¦¼
         bool reachedPeak = false;
         while (!hasLanded)
         {
-            // ÇöÀç À§Ä¡°¡ ÀÌÀü À§Ä¡º¸´Ù ³·À¸¸é ÃÖ°íÁ¡À» Áö³­ °Í
+            // í˜„ì¬ ìœ„ì¹˜ê°€ ì´ì „ ìœ„ì¹˜ë³´ë‹¤ ë‚®ìœ¼ë©´ ìµœê³ ì ì„ ì§€ë‚œ ê²ƒ
             if (transform.position.y < lastPosition.y)
             {
                 reachedPeak = true;
             }
-            // ÃÖ°íÁ¡À» Áö³ª°í Áö¸é¿¡ ´ê¾Ò´ÂÁö È®ÀÎ
+            // ìµœê³ ì ì„ ì§€ë‚˜ê³  ì§€ë©´ì— ë‹¿ì•˜ëŠ”ì§€ í™•ì¸
             if (reachedPeak && transform.position.y <= groundY)
             {
-                // ÂøÁö À§Ä¡ ÀúÀå
+                // ì°©ì§€ ìœ„ì¹˜ ì €ì¥
                 Vector3 landingPosition = transform.position;
 
-                // X-Z Æò¸é¿¡¼­ÀÇ Á÷¼± °Å¸® °è»ê (2D Æò¸é¿¡¼­ÀÇ ºñ°Å¸®)
+                // X-Z í‰ë©´ì—ì„œì˜ ì§ì„  ê±°ë¦¬ ê³„ì‚° (2D í‰ë©´ì—ì„œì˜ ë¹„ê±°ë¦¬)
                 float xDistance = landingPosition.x - launchPosition.x;
                 float zDistance = landingPosition.z - launchPosition.z;
                 actualDistance = Mathf.Sqrt(xDistance * xDistance + zDistance * zDistance);
 
                 hasLanded = true;
-                // HitInfoDisplay¿¡ ½ÇÁ¦ °Å¸® ¾÷µ¥ÀÌÆ®
+                // HitInfoDisplayì— ì‹¤ì œ ê±°ë¦¬ ì—…ë°ì´íŠ¸
                 UpdateHitInfoDisplay();
                 if (debugMode)
                 {
-                    Debug.Log($"°øÀÌ ÂøÁöÇß½À´Ï´Ù! ½ÇÁ¦ ºñ°Å¸®: {actualDistance:F1}m");
+                    Debug.Log($"ê³µì´ ì°©ì§€í–ˆìŠµë‹ˆë‹¤! ì‹¤ì œ ë¹„ê±°ë¦¬: {actualDistance:F1}m");
                 }
                 break;
             }
@@ -559,21 +559,21 @@ public class BallController : MonoBehaviour
         }
     }
 
-    // HitInfoDisplay¿¡ ½ÇÁ¦ ÃøÁ¤µÈ °Å¸® Á¤º¸ ¾÷µ¥ÀÌÆ®
+    // HitInfoDisplayì— ì‹¤ì œ ì¸¡ì •ëœ ê±°ë¦¬ ì •ë³´ ì—…ë°ì´íŠ¸
     private void UpdateHitInfoDisplay()
     {
         HitInfoDisplay hitInfoDisplay = FindObjectOfType<HitInfoDisplay>();
         if (hitInfoDisplay != null)
         {
-            // »õ·Î¿î HitInfo °´Ã¼ »ı¼º (±âÁ¸ °ªµéÀº À¯Áö)
+            // ìƒˆë¡œìš´ HitInfo ê°ì²´ ìƒì„± (ê¸°ì¡´ ê°’ë“¤ì€ ìœ ì§€)
             HitInfo newHitInfo = new HitInfo();
 
-            // ±âÁ¸¿¡ Ç¥½ÃµÇ´ø Á¤º¸ °¡Á®¿À±â (ÀÌ ¸Ş¼­µå°¡ HitInfoDisplay¿¡ ÀÖ´Ù°í °¡Á¤)
+            // ê¸°ì¡´ì— í‘œì‹œë˜ë˜ ì •ë³´ ê°€ì ¸ì˜¤ê¸° (ì´ ë©”ì„œë“œê°€ HitInfoDisplayì— ìˆë‹¤ê³  ê°€ì •)
             HitInfo currentInfo = hitInfoDisplay.GetCurrentHitInfo();
 
             if (currentInfo != null)
             {
-                // ±âÁ¸ Á¤º¸ º¹»ç
+                // ê¸°ì¡´ ì •ë³´ ë³µì‚¬
                 newHitInfo.ExitVelocity = currentInfo.ExitVelocity;
                 newHitInfo.LaunchAngle = currentInfo.LaunchAngle;
                 newHitInfo.Direction = currentInfo.Direction;
@@ -581,10 +581,10 @@ public class BallController : MonoBehaviour
                 newHitInfo.SpinAxis = currentInfo.SpinAxis;
             }
 
-            // ½ÇÁ¦ ÃøÁ¤µÈ °Å¸®·Î ¾÷µ¥ÀÌÆ®
+            // ì‹¤ì œ ì¸¡ì •ëœ ê±°ë¦¬ë¡œ ì—…ë°ì´íŠ¸
             newHitInfo.EstimatedDistance = actualDistance;
 
-            // ¾÷µ¥ÀÌÆ®µÈ Á¤º¸ Ç¥½Ã (ÀÌ ¸Ş¼­µå°¡ HitInfoDisplay¿¡ ÀÖ´Ù°í °¡Á¤)
+            // ì—…ë°ì´íŠ¸ëœ ì •ë³´ í‘œì‹œ (ì´ ë©”ì„œë“œê°€ HitInfoDisplayì— ìˆë‹¤ê³  ê°€ì •)
             hitInfoDisplay.DisplayHitInfo(newHitInfo);
         }
     }
@@ -595,9 +595,9 @@ public class BallController : MonoBehaviour
     }
 
     /**
-     * °øÀÌ ¹ß»çµÇ¾ú´ÂÁö È®ÀÎÇÏ´Â ¸Ş¼­µå
+     * ê³µì´ ë°œì‚¬ë˜ì—ˆëŠ”ì§€ í™•ì¸í•˜ëŠ” ë©”ì„œë“œ
      * 
-     * @return °ø ¹ß»ç »óÅÂ
+     * @return ê³µ ë°œì‚¬ ìƒíƒœ
      */
     public bool IsBallLaunched()
     {
@@ -605,47 +605,47 @@ public class BallController : MonoBehaviour
     }
 
     /**
-     * È¸ÀüÃà ±âÁî¸ğ¸¦ ±×¸®´Â ¸Ş¼­µå
-     * Unity ¿¡µğÅÍ¿¡¼­¸¸ Ç¥½ÃµË´Ï´Ù.
+     * íšŒì „ì¶• ê¸°ì¦ˆëª¨ë¥¼ ê·¸ë¦¬ëŠ” ë©”ì„œë“œ
+     * Unity ì—ë””í„°ì—ì„œë§Œ í‘œì‹œë©ë‹ˆë‹¤.
      */
 
     private void OnDrawGizmos()
     {
-        // ±âÁî¸ğ Ç¥½Ã°¡ ²¨Á®ÀÖ°Å³ª ÇÃ·¹ÀÌ ¸ğµå°¡ ¾Æ´Ñ °æ¿ì Ç¥½ÃÇÏÁö ¾ÊÀ½
+        // ê¸°ì¦ˆëª¨ í‘œì‹œê°€ êº¼ì ¸ìˆê±°ë‚˜ í”Œë ˆì´ ëª¨ë“œê°€ ì•„ë‹Œ ê²½ìš° í‘œì‹œí•˜ì§€ ì•ŠìŒ
         if (!showRotationAxisGizmo || !Application.isPlaying)
             return;
 
-        // ¸®Áöµå¹Ùµğ°¡ ¾ø°Å³ª °øÀÌ ¹ß»çµÇÁö ¾ÊÀº °æ¿ì Ç¥½ÃÇÏÁö ¾ÊÀ½
+        // ë¦¬ì§€ë“œë°”ë””ê°€ ì—†ê±°ë‚˜ ê³µì´ ë°œì‚¬ë˜ì§€ ì•Šì€ ê²½ìš° í‘œì‹œí•˜ì§€ ì•ŠìŒ
         if (ballRigidbody == null || !isBallLaunched)
             return;
 
-        // ÇöÀç À§Ä¡
+        // í˜„ì¬ ìœ„ì¹˜
         Vector3 position = transform.position;
 
-        // ÇöÀç °¢¼Óµµ º¤ÅÍ °¡Á®¿À±â
+        // í˜„ì¬ ê°ì†ë„ ë²¡í„° ê°€ì ¸ì˜¤ê¸°
         Vector3 angularVelocity = ballRigidbody.angularVelocity;
 
-        // °¢¼Óµµ°¡ ³Ê¹« ÀÛÀ¸¸é Ç¥½ÃÇÏÁö ¾ÊÀ½
+        // ê°ì†ë„ê°€ ë„ˆë¬´ ì‘ìœ¼ë©´ í‘œì‹œí•˜ì§€ ì•ŠìŒ
         if (angularVelocity.magnitude < 0.1f)
             return;
 
-        // ÇöÀç È¸ÀüÃà °è»ê (°¢¼Óµµ º¤ÅÍÀÇ ¹æÇâÀÌ È¸ÀüÃà)
+        // í˜„ì¬ íšŒì „ì¶• ê³„ì‚° (ê°ì†ë„ ë²¡í„°ì˜ ë°©í–¥ì´ íšŒì „ì¶•)
         Vector3 rotationAxis = angularVelocity.normalized;
 
-        // È¸ÀüÃà Ç¥½Ã
+        // íšŒì „ì¶• í‘œì‹œ
         Gizmos.color = rotationAxisColor;
         Gizmos.DrawLine(position, position + rotationAxis * gizmoLength);
 
-        // È¸ÀüÃà ³¡¿¡ ÀÛÀº ±¸Ã¼·Î Ç¥½Ã
+        // íšŒì „ì¶• ëì— ì‘ì€ êµ¬ì²´ë¡œ í‘œì‹œ
         Gizmos.DrawSphere(position + rotationAxis * gizmoLength, 0.05f);
 
-        // ¼Óµµ º¤ÅÍµµ Ç¥½Ã (µğ¹ö±× ¸ğµåÀÏ ¶§¸¸)
+        // ì†ë„ ë²¡í„°ë„ í‘œì‹œ (ë””ë²„ê·¸ ëª¨ë“œì¼ ë•Œë§Œ)
         if (debugMode)
         {
-            // ¼Óµµ º¤ÅÍ´Â ÆÄ¶õ»öÀ¸·Î Ç¥½Ã
+            // ì†ë„ ë²¡í„°ëŠ” íŒŒë€ìƒ‰ìœ¼ë¡œ í‘œì‹œ
             Gizmos.color = Color.blue;
             Vector3 velocityDirection = ballRigidbody.velocity.normalized;
-            float velocityLength = Mathf.Min(ballRigidbody.velocity.magnitude * 0.1f, gizmoLength); // ¼Óµµ¿¡ ºñ·ÊÇÑ ±æÀÌ
+            float velocityLength = Mathf.Min(ballRigidbody.velocity.magnitude * 0.1f, gizmoLength); // ì†ë„ì— ë¹„ë¡€í•œ ê¸¸ì´
 
             Gizmos.DrawLine(position, position + velocityDirection * velocityLength);
             Gizmos.DrawSphere(position + velocityDirection * velocityLength, 0.03f);
@@ -654,15 +654,15 @@ public class BallController : MonoBehaviour
 }
 
 /**
- * BallController.cs - °£¼ÒÈ­µÈ °ø ¹°¸® ½Ã¹Ä·¹ÀÌ¼Ç ÄÁÆ®·Ñ·¯
+ * BallController.cs - ê°„ì†Œí™”ëœ ê³µ ë¬¼ë¦¬ ì‹œë®¬ë ˆì´ì…˜ ì»¨íŠ¸ë¡¤ëŸ¬
  * 
- * ÀÌ ½ºÅ©¸³Æ®´Â Unity¿¡¼­ °øÀÇ ±âº»ÀûÀÎ ¹°¸®Àû ¿òÁ÷ÀÓÀ» ´ã´çÇÕ´Ï´Ù.
- * ÁÖ¿ä ±â´É:
- * - ¿ÜºÎ¿¡¼­ Á¦°øµÈ ½ÃÀÛ À§Ä¡¿Í ¸ñÇ¥ À§Ä¡¸¦ »ç¿ëÇÏ¿© °øÀ» ¹ß»ç
- * - °ø±â ÀúÇ×°ú ¸¶±×´©½º È¿°ú¸¦ ÅëÇÑ Çö½ÇÀûÀÎ ¿òÁ÷ÀÓ ±¸Çö
- * - ÁöÁ¤µÈ ½Ã°£ ÈÄ °¨¼Ó Àû¿ë
- * - È¸ÀüÃà ½Ã°¢È­¸¦ À§ÇÑ ±âÁî¸ğ Ç¥½Ã ±â´É Ãß°¡
+ * ì´ ìŠ¤í¬ë¦½íŠ¸ëŠ” Unityì—ì„œ ê³µì˜ ê¸°ë³¸ì ì¸ ë¬¼ë¦¬ì  ì›€ì§ì„ì„ ë‹´ë‹¹í•©ë‹ˆë‹¤.
+ * ì£¼ìš” ê¸°ëŠ¥:
+ * - ì™¸ë¶€ì—ì„œ ì œê³µëœ ì‹œì‘ ìœ„ì¹˜ì™€ ëª©í‘œ ìœ„ì¹˜ë¥¼ ì‚¬ìš©í•˜ì—¬ ê³µì„ ë°œì‚¬
+ * - ê³µê¸° ì €í•­ê³¼ ë§ˆê·¸ëˆ„ìŠ¤ íš¨ê³¼ë¥¼ í†µí•œ í˜„ì‹¤ì ì¸ ì›€ì§ì„ êµ¬í˜„
+ * - ì§€ì •ëœ ì‹œê°„ í›„ ê°ì† ì ìš©
+ * - íšŒì „ì¶• ì‹œê°í™”ë¥¼ ìœ„í•œ ê¸°ì¦ˆëª¨ í‘œì‹œ ê¸°ëŠ¥ ì¶”ê°€
  * 
- * Âü°í: ÀÌ ¹öÀüÀº ÃÖ¼ÒÇÑÀÇ ¹°¸® ½Ã¹Ä·¹ÀÌ¼Ç¸¸ Æ÷ÇÔÇÏµµ·Ï °£¼ÒÈ­µÇ¾ú½À´Ï´Ù.
+ * ì°¸ê³ : ì´ ë²„ì „ì€ ìµœì†Œí•œì˜ ë¬¼ë¦¬ ì‹œë®¬ë ˆì´ì…˜ë§Œ í¬í•¨í•˜ë„ë¡ ê°„ì†Œí™”ë˜ì—ˆìŠµë‹ˆë‹¤.
  * 
  */

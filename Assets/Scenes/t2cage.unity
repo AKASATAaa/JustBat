@@ -448,7 +448,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5af1b4e604bf72e48835964608f00269, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyTime: 10
+  destroyTime: 20
   ballPrefab: {fileID: 3220906015835315101, guid: cdf30e1b065dcfa40b5b2e5894c108b4, type: 3}
   releasePoint: {fileID: 1298142313}
   pitcherAnimator: {fileID: 81715452}

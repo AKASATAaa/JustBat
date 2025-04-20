@@ -1,9 +1,9 @@
-/**
- * BallSpawner.cs - °ø »ı¼º ¹× ¹ß»ç Á¦¾î ÄÄÆ÷³ÍÆ®
+ï»¿/**
+ * BallSpawner.cs - ê³µ ìƒì„± ë° ë°œì‚¬ ì œì–´ ì»´í¬ë„ŒíŠ¸
  * 
- * ÀÌ ½ºÅ©¸³Æ®´Â ´Ù¾çÇÑ ±¸Á¾ÀÇ °øÀ» ÁÖ±âÀûÀ¸·Î »ı¼ºÇÏ°í ¹ß»çÇÏ´Â ¿ªÇÒÀ» ´ã´çÇÕ´Ï´Ù.
- * ¿©·¯ Á¾·ùÀÇ °ø(ÆĞ½ºÆ®º¼, ½½¶óÀÌ´õ, Ä¿ºê, Ã¼ÀÎÁö¾÷)°ú ´Ù¾çÇÑ 
- * ¼Óµµ ¼³Á¤À» ÅëÇØ ´Ù¾çÇÑ ¹°¸®Àû Æ¯¼ºÀ» °¡Áø °øÀ» ¸¸µé¾î³À´Ï´Ù.
+ * ì´ ìŠ¤í¬ë¦½íŠ¸ëŠ” ë‹¤ì–‘í•œ êµ¬ì¢…ì˜ ê³µì„ ì£¼ê¸°ì ìœ¼ë¡œ ìƒì„±í•˜ê³  ë°œì‚¬í•˜ëŠ” ì—­í• ì„ ë‹´ë‹¹í•©ë‹ˆë‹¤.
+ * ì—¬ëŸ¬ ì¢…ë¥˜ì˜ ê³µ(íŒ¨ìŠ¤íŠ¸ë³¼, ìŠ¬ë¼ì´ë”, ì»¤ë¸Œ, ì²´ì¸ì§€ì—…)ê³¼ ë‹¤ì–‘í•œ 
+ * ì†ë„ ì„¤ì •ì„ í†µí•´ ë‹¤ì–‘í•œ ë¬¼ë¦¬ì  íŠ¹ì„±ì„ ê°€ì§„ ê³µì„ ë§Œë“¤ì–´ëƒ…ë‹ˆë‹¤.
  */
 
 using System.Collections;
@@ -15,125 +15,125 @@ using UnityEngine.UI;
 
 public class BallSpawner : MonoBehaviour
 {
-    [Header("°ø »ı¼º ¼³Á¤")]
-    [Tooltip("°ø ÀÚµ¿ ¼Ò¸ê ½Ã°£ (ÃÊ)")]
+    [Header("ê³µ ìƒì„± ì„¤ì •")]
+    [Tooltip("ê³µ ìë™ ì†Œë©¸ ì‹œê°„ (ì´ˆ)")]
     public float destroyTime = 5.0f;
 
-    [Tooltip("»ı¼ºÇÒ °øÀÇ ÇÁ¸®ÆÕ")]
+    [Tooltip("ìƒì„±í•  ê³µì˜ í”„ë¦¬íŒ¹")]
     public GameObject ballPrefab;
 
-    [Tooltip("°ø ¹ß»ç À§Ä¡")]
+    [Tooltip("ê³µ ë°œì‚¬ ìœ„ì¹˜")]
     public Transform releasePoint;
 
     //
 
-    [Header("¾Ö´Ï¸ŞÀÌ¼Ç ¼³Á¤")]
-    [Tooltip("Åõ¼ö ¾Ö´Ï¸ŞÀÌÅÍ ÄÄÆ÷³ÍÆ®")]
+    [Header("ì• ë‹ˆë©”ì´ì…˜ ì„¤ì •")]
+    [Tooltip("íˆ¬ìˆ˜ ì• ë‹ˆë©”ì´í„° ì»´í¬ë„ŒíŠ¸")]
     public Animator pitcherAnimator;
 
-    [Tooltip("Åõ±¸ »çÀÌ ´ë±â ½Ã°£ (ÃÊ)")]
+    [Tooltip("íˆ¬êµ¬ ì‚¬ì´ ëŒ€ê¸° ì‹œê°„ (ì´ˆ)")]
     public float pitchDelay = 2.0f;
 
-    [Tooltip("¾Ö´Ï¸ŞÀÌ¼Ç Æ®¸®°Å ÆÄ¶ó¹ÌÅÍ ÀÌ¸§")]
+    [Tooltip("ì• ë‹ˆë©”ì´ì…˜ íŠ¸ë¦¬ê±° íŒŒë¼ë¯¸í„° ì´ë¦„")]
     public string[] pitchAnimTriggers = { "ThrowFastball", "ThrowSlider", "ThrowCurve", "ThrowChangeup" };
 
-    [Tooltip("ÁØºñ ÀÚ¼¼ ¾Ö´Ï¸ŞÀÌ¼Ç Æ®¸®°Å")]
+    [Tooltip("ì¤€ë¹„ ìì„¸ ì• ë‹ˆë©”ì´ì…˜ íŠ¸ë¦¬ê±°")]
     public string readyAnimTrigger = "Ready";
 
-    [Header("¹öÆ° ¿ÀºêÁ§Æ®")]
-    [Tooltip("±¸Á¾ ¼±ÅÃ ¹öÆ°µé")]
+    [Header("ë²„íŠ¼ ì˜¤ë¸Œì íŠ¸")]
+    [Tooltip("êµ¬ì¢… ì„ íƒ ë²„íŠ¼ë“¤")]
     public Button fastballButton;
     public Button sliderButton;
     public Button curveButton;
     public Button changeupButton;
     public Button knuckleballButton;
 
-    [Tooltip("¼Óµµ Á¶Àı ¹× ¸ğµå ¹öÆ°µé")]
+    [Tooltip("ì†ë„ ì¡°ì ˆ ë° ëª¨ë“œ ë²„íŠ¼ë“¤")]
     public Button increaseSpeedButton;
     public Button decreaseSpeedButton;
     public Button randomModeButton;
 
-    [Header("¹°¸® Á¤º¸")]
-    [Tooltip("°øÀÇ Ãæµ¹ °¢µµ")]
+    [Header("ë¬¼ë¦¬ ì •ë³´")]
+    [Tooltip("ê³µì˜ ì¶©ëŒ ê°ë„")]
     public float hitAngle;
 
-    [Tooltip("°øÀÇ ¼Óµµ (km/h)")]
+    [Tooltip("ê³µì˜ ì†ë„ (km/h)")]
     public float ballSpeed;
 
-    [Tooltip("Å¸°İ ¼Óµµ (km/h)")]
+    [Tooltip("íƒ€ê²© ì†ë„ (km/h)")]
     public float hitSpeed;
 
-    [Tooltip("¹ß»ç °¢µµ (µµ)")]
+    [Tooltip("ë°œì‚¬ ê°ë„ (ë„)")]
     public float launchAngle;
 
-    [Tooltip("¿¹»ó ºñÇà °Å¸® (m)")]
+    [Tooltip("ì˜ˆìƒ ë¹„í–‰ ê±°ë¦¬ (m)")]
     public float expectedDistance;
 
-    [Header("Å¸°Ù ¼³Á¤")]
-    [Tooltip("Å¸°ÙÇÒ ½ºÆ®¶óÀÌÅ© Á¸ ¿ÀºêÁ§Æ®")]
+    [Header("íƒ€ê²Ÿ ì„¤ì •")]
+    [Tooltip("íƒ€ê²Ÿí•  ìŠ¤íŠ¸ë¼ì´í¬ ì¡´ ì˜¤ë¸Œì íŠ¸")]
     public GameObject pitchRangeObject;
 
-    // ±¸Á¾º° PitchRange ¿ÀºêÁ§Æ® Ãß°¡
-    [Tooltip("ÆĞ½ºÆ®º¼¿ë ½ºÆ®¶óÀÌÅ© Á¸ ¿ÀºêÁ§Æ®")]
+    // êµ¬ì¢…ë³„ PitchRange ì˜¤ë¸Œì íŠ¸ ì¶”ê°€
+    [Tooltip("íŒ¨ìŠ¤íŠ¸ë³¼ìš© ìŠ¤íŠ¸ë¼ì´í¬ ì¡´ ì˜¤ë¸Œì íŠ¸")]
     public GameObject fastballPitchRangeObject;
 
-    [Tooltip("½½¶óÀÌ´õ¿ë ½ºÆ®¶óÀÌÅ© Á¸ ¿ÀºêÁ§Æ®")]
+    [Tooltip("ìŠ¬ë¼ì´ë”ìš© ìŠ¤íŠ¸ë¼ì´í¬ ì¡´ ì˜¤ë¸Œì íŠ¸")]
     public GameObject sliderPitchRangeObject;
 
-    [Tooltip("Ä¿ºê¿ë ½ºÆ®¶óÀÌÅ© Á¸ ¿ÀºêÁ§Æ®")]
+    [Tooltip("ì»¤ë¸Œìš© ìŠ¤íŠ¸ë¼ì´í¬ ì¡´ ì˜¤ë¸Œì íŠ¸")]
     public GameObject curvePitchRangeObject;
 
-    [Tooltip("Ã¼ÀÎÁö¾÷¿ë ½ºÆ®¶óÀÌÅ© Á¸ ¿ÀºêÁ§Æ®")]
+    [Tooltip("ì²´ì¸ì§€ì—…ìš© ìŠ¤íŠ¸ë¼ì´í¬ ì¡´ ì˜¤ë¸Œì íŠ¸")]
     public GameObject changeupPitchRangeObject;
 
-    [Header("UI Á¤º¸ Ç¥½Ã")]
-    [Tooltip("±¸Á¾°ú ±¸¼Ó Á¤º¸¸¦ Ç¥½ÃÇÒ TextMeshPro ÄÄÆ÷³ÍÆ®")]
+    [Header("UI ì •ë³´ í‘œì‹œ")]
+    [Tooltip("êµ¬ì¢…ê³¼ êµ¬ì† ì •ë³´ë¥¼ í‘œì‹œí•  TextMeshPro ì»´í¬ë„ŒíŠ¸")]
     public TextMeshProUGUI pitchInfoText;
 
-    [Header("µğ¹ö±× ¼³Á¤")]
-    [Tooltip("µğ¹ö±× ¸ğµå È°¼ºÈ­ ¿©ºÎ")]
+    [Header("ë””ë²„ê·¸ ì„¤ì •")]
+    [Tooltip("ë””ë²„ê·¸ ëª¨ë“œ í™œì„±í™” ì—¬ë¶€")]
     public bool debugMode = false;
 
-    [Tooltip("°ø ¹ß»ç Á¤º¸ ·Î±× Ãâ·Â ¿©ºÎ")]
+    [Tooltip("ê³µ ë°œì‚¬ ì •ë³´ ë¡œê·¸ ì¶œë ¥ ì—¬ë¶€")]
     public bool logBallInfo = true;
 
-    [Tooltip("·£´ı »ı¼º °ü·Ã ·Î±× Ãâ·Â ¿©ºÎ")]
+    [Tooltip("ëœë¤ ìƒì„± ê´€ë ¨ ë¡œê·¸ ì¶œë ¥ ì—¬ë¶€")]
     public bool logRandomGeneration = true;
 
-    [Tooltip("¾Ö´Ï¸ŞÀÌ¼Ç ÀÌº¥Æ® ·Î±× Ãâ·Â ¿©ºÎ")]
+    [Tooltip("ì• ë‹ˆë©”ì´ì…˜ ì´ë²¤íŠ¸ ë¡œê·¸ ì¶œë ¥ ì—¬ë¶€")]
     public bool logAnimationEvents = true;
 
-    [Tooltip("Å¸°Ù À§Ä¡ ±âÁî¸ğ Ç¥½Ã ¿©ºÎ")]
+    [Tooltip("íƒ€ê²Ÿ ìœ„ì¹˜ ê¸°ì¦ˆëª¨ í‘œì‹œ ì—¬ë¶€")]
     public bool showTargetGizmo = true;
 
-    [Tooltip("Å¸°Ù À§Ä¡ ±âÁî¸ğ »ö»ó")]
+    [Tooltip("íƒ€ê²Ÿ ìœ„ì¹˜ ê¸°ì¦ˆëª¨ ìƒ‰ìƒ")]
     public Color targetGizmoColor = new Color(1f, 0.5f, 0f, 0.5f);
 
-    [Tooltip("Å¸°Ù À§Ä¡ ±âÁî¸ğ Å©±â")]
+    [Tooltip("íƒ€ê²Ÿ ìœ„ì¹˜ ê¸°ì¦ˆëª¨ í¬ê¸°")]
     public float targetGizmoSize = 0.1f;
 
-    // ÇöÀç Åõ±¸ Á¤º¸
+    // í˜„ì¬ íˆ¬êµ¬ ì •ë³´
     public string pitchTypeName;
 
-    // ±¸Á¾ ¹× ¼Óµµ ¼³Á¤ °ü·Ã º¯¼ö
+    // êµ¬ì¢… ë° ì†ë„ ì„¤ì • ê´€ë ¨ ë³€ìˆ˜
     private PitchSettingsManager pitchSettingsManager;
     private List<BallSettings> currentPitchSettings;
     private int speedIndex;
     private int[] speedValues = { 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170 };
     private bool isRandomMode;
 
-    // ¸ñÇ¥ À§Ä¡ °ü·Ã º¯¼ö
+    // ëª©í‘œ ìœ„ì¹˜ ê´€ë ¨ ë³€ìˆ˜
     private Vector3 initialTargetP;
     private Vector3 randomTargetP;
-    private Vector3 pitchRangeSize; // PitchRange ¿ÀºêÁ§Æ®ÀÇ Å©±â
+    private Vector3 pitchRangeSize; // PitchRange ì˜¤ë¸Œì íŠ¸ì˜ í¬ê¸°
 
-    // ¾Ö´Ï¸ŞÀÌ¼Ç ÀÌº¥Æ®¿¡¼­ »ç¿ëÇÒ º¯¼ö
+    // ì• ë‹ˆë©”ì´ì…˜ ì´ë²¤íŠ¸ì—ì„œ ì‚¬ìš©í•  ë³€ìˆ˜
     private bool isAnimationInProgress = false;
     private bool waitingToSpawn = false;
     private BallSettings pendingBallSettings;
     private string pendingPitchType = "";
 
-    // Åõ±¸ ¹üÀ§ µ¥ÀÌÅÍ ±¸Á¶Ã¼
+    // íˆ¬êµ¬ ë²”ìœ„ ë°ì´í„° êµ¬ì¡°ì²´
     private struct PitchRangeData
     {
         public Vector3 position;
@@ -143,43 +143,43 @@ public class BallSpawner : MonoBehaviour
     private Dictionary<string, PitchRangeData> pitchRangeDataMap = new Dictionary<string, PitchRangeData>();
 
     /**
-     * ÃÊ±âÈ­ ¸Ş¼­µå
-     * ±¸Á¾ ¼³Á¤ °ü¸®ÀÚ¸¦ Ã£°í, ¹öÆ° ÀÌº¥Æ®¸¦ ¼³Á¤ÇÏ¸ç, °ø »ı¼º ÄÚ·çÆ¾À» ½ÃÀÛÇÕ´Ï´Ù.
+     * ì´ˆê¸°í™” ë©”ì„œë“œ
+     * êµ¬ì¢… ì„¤ì • ê´€ë¦¬ìë¥¼ ì°¾ê³ , ë²„íŠ¼ ì´ë²¤íŠ¸ë¥¼ ì„¤ì •í•˜ë©°, ê³µ ìƒì„± ì½”ë£¨í‹´ì„ ì‹œì‘í•©ë‹ˆë‹¤.
      */
     void Start()
     {
-        // ±¸Á¾ ¼³Á¤ °ü¸®ÀÚ Ã£±â
+        // êµ¬ì¢… ì„¤ì • ê´€ë¦¬ì ì°¾ê¸°
         InitializePitchSettingsManager();
 
-        // UI Á¤º¸ ¾÷µ¥ÀÌÆ®
+        // UI ì •ë³´ ì—…ë°ì´íŠ¸
         UpdatePitchInfoDisplay();
 
-        // ¾Ö´Ï¸ŞÀÌÅÍ ÄÄÆ÷³ÍÆ® È®ÀÎ
+        // ì• ë‹ˆë©”ì´í„° ì»´í¬ë„ŒíŠ¸ í™•ì¸
         CheckAnimatorComponent();
 
-        // ÃÊ±â ¼³Á¤À¸·Î ÆĞ½ºÆ®º¼ ¼±ÅÃ
+        // ì´ˆê¸° ì„¤ì •ìœ¼ë¡œ íŒ¨ìŠ¤íŠ¸ë³¼ ì„ íƒ
         currentPitchSettings = pitchSettingsManager.fastballSettings;
         speedIndex = 0;
         isRandomMode = false;
 
-        // PitchRange ¿ÀºêÁ§Æ® ¼³Á¤
+        // PitchRange ì˜¤ë¸Œì íŠ¸ ì„¤ì •
         InitializePitchRange();
         InitializePitchRangeForAllTypes();
 
-        // ¹öÆ° ÀÌº¥Æ® ¿¬°á
+        // ë²„íŠ¼ ì´ë²¤íŠ¸ ì—°ê²°
         AttachButtonListeners();
 
-        // °ø »ı¼º ÄÚ·çÆ¾ ½ÃÀÛ
+        // ê³µ ìƒì„± ì½”ë£¨í‹´ ì‹œì‘
         StartCoroutine(AnimatedPitchingSequence());
 
         if (debugMode)
         {
-            Debug.Log("BallSpawner ÃÊ±âÈ­ ¿Ï·á");
+            Debug.Log("BallSpawner ì´ˆê¸°í™” ì™„ë£Œ");
         }
     }
 
     /**
-     * Åõ±¸ ¼³Á¤ °ü¸®ÀÚ ÃÊ±âÈ­
+     * íˆ¬êµ¬ ì„¤ì • ê´€ë¦¬ì ì´ˆê¸°í™”
      */
     private void InitializePitchSettingsManager()
     {
@@ -187,12 +187,12 @@ public class BallSpawner : MonoBehaviour
 
         if (pitchSettingsManager == null && debugMode)
         {
-            Debug.LogError("PitchSettingsManager¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù!");
+            Debug.LogError("PitchSettingsManagerë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤!");
         }
     }
 
     /**
-     * ¾Ö´Ï¸ŞÀÌÅÍ ÄÄÆ÷³ÍÆ® È®ÀÎ
+     * ì• ë‹ˆë©”ì´í„° ì»´í¬ë„ŒíŠ¸ í™•ì¸
      */
     private void CheckAnimatorComponent()
     {
@@ -201,17 +201,17 @@ public class BallSpawner : MonoBehaviour
             pitcherAnimator = GetComponent<Animator>();
             if (pitcherAnimator == null && debugMode)
             {
-                Debug.LogError("Åõ¼ö ¾Ö´Ï¸ŞÀÌÅÍ¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù. ÄÄÆ÷³ÍÆ®¸¦ Ãß°¡ÇÏ°Å³ª ÂüÁ¶¸¦ ¼³Á¤ÇØÁÖ¼¼¿ä.");
+                Debug.LogError("íˆ¬ìˆ˜ ì• ë‹ˆë©”ì´í„°ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. ì»´í¬ë„ŒíŠ¸ë¥¼ ì¶”ê°€í•˜ê±°ë‚˜ ì°¸ì¡°ë¥¼ ì„¤ì •í•´ì£¼ì„¸ìš”.");
             }
         }
     }
 
     /**
-     * ±¸Á¾º° PitchRange µ¥ÀÌÅÍ ÃÊ±âÈ­
+     * êµ¬ì¢…ë³„ PitchRange ë°ì´í„° ì´ˆê¸°í™”
      */
     private void InitializePitchRangeForAllTypes()
     {
-        // ±âº» PitchRange µ¥ÀÌÅÍ ÀúÀå
+        // ê¸°ë³¸ PitchRange ë°ì´í„° ì €ì¥
         PitchRangeData defaultData = new PitchRangeData
         {
             position = initialTargetP,
@@ -219,21 +219,21 @@ public class BallSpawner : MonoBehaviour
         };
         pitchRangeDataMap["Default"] = defaultData;
 
-        // ÆĞ½ºÆ®º¼ PitchRange ¼³Á¤
+        // íŒ¨ìŠ¤íŠ¸ë³¼ PitchRange ì„¤ì •
         InitializePitchRangeForType(fastballPitchRangeObject, "Fastball", defaultData);
 
-        // ½½¶óÀÌ´õ PitchRange ¼³Á¤
+        // ìŠ¬ë¼ì´ë” PitchRange ì„¤ì •
         InitializePitchRangeForType(sliderPitchRangeObject, "Slider", defaultData);
 
-        // Ä¿ºê PitchRange ¼³Á¤
+        // ì»¤ë¸Œ PitchRange ì„¤ì •
         InitializePitchRangeForType(curvePitchRangeObject, "Curve", defaultData);
 
-        // Ã¼ÀÎÁö¾÷ PitchRange ¼³Á¤
+        // ì²´ì¸ì§€ì—… PitchRange ì„¤ì •
         InitializePitchRangeForType(changeupPitchRangeObject, "Changeup", defaultData);
     }
 
     /**
-     * Æ¯Á¤ ±¸Á¾ÀÇ PitchRange ÃÊ±âÈ­
+     * íŠ¹ì • êµ¬ì¢…ì˜ PitchRange ì´ˆê¸°í™”
      */
     private void InitializePitchRangeForType(GameObject pitchRangeObj, string typeName, PitchRangeData defaultData)
     {
@@ -243,7 +243,7 @@ public class BallSpawner : MonoBehaviour
 
             if (debugMode && logRandomGeneration)
             {
-                Debug.Log($"{typeName} PitchRange ÃÊ±âÈ­: À§Ä¡={pitchRangeDataMap[typeName].position}, Å©±â={pitchRangeDataMap[typeName].size}");
+                Debug.Log($"{typeName} PitchRange ì´ˆê¸°í™”: ìœ„ì¹˜={pitchRangeDataMap[typeName].position}, í¬ê¸°={pitchRangeDataMap[typeName].size}");
             }
         }
         else
@@ -252,41 +252,41 @@ public class BallSpawner : MonoBehaviour
 
             if (debugMode && logRandomGeneration)
             {
-                Debug.Log($"{typeName}¿ë PitchRange ¿ÀºêÁ§Æ®°¡ ¾ø¾î ±âº»°ª »ç¿ë");
+                Debug.Log($"{typeName}ìš© PitchRange ì˜¤ë¸Œì íŠ¸ê°€ ì—†ì–´ ê¸°ë³¸ê°’ ì‚¬ìš©");
             }
         }
     }
 
     /**
-     * PitchRange µ¥ÀÌÅÍ °¡Á®¿À±â
+     * PitchRange ë°ì´í„° ê°€ì ¸ì˜¤ê¸°
      */
     private PitchRangeData GetPitchRangeData(GameObject pitchRangeObj)
     {
         PitchRangeData data = new PitchRangeData();
         data.position = pitchRangeObj.transform.position;
 
-        // Collider³ª Renderer·ÎºÎÅÍ ¿ÀºêÁ§Æ® Å©±â ¾ò±â
+        // Colliderë‚˜ Rendererë¡œë¶€í„° ì˜¤ë¸Œì íŠ¸ í¬ê¸° ì–»ê¸°
         Collider rangeCollider = pitchRangeObj.GetComponent<Collider>();
         Renderer rangeRenderer = pitchRangeObj.GetComponent<Renderer>();
 
         if (rangeCollider != null)
         {
-            // ColliderÀÇ bounds Å©±â »ç¿ë
+            // Colliderì˜ bounds í¬ê¸° ì‚¬ìš©
             data.size = rangeCollider.bounds.size;
         }
         else if (rangeRenderer != null)
         {
-            // RendererÀÇ bounds Å©±â »ç¿ë
+            // Rendererì˜ bounds í¬ê¸° ì‚¬ìš©
             data.size = rangeRenderer.bounds.size;
         }
         else
         {
-            // ±âº» Å©±â ¼³Á¤
+            // ê¸°ë³¸ í¬ê¸° ì„¤ì •
             data.size = new Vector3(0.3f, 0.3f, 0f);
 
             if (debugMode)
             {
-                Debug.LogWarning($"{pitchRangeObj.name}¿¡¼­ Å©±â¸¦ °¡Á®¿Ã ¼ö ¾ø½À´Ï´Ù. ±âº» Å©±â¸¦ »ç¿ëÇÕ´Ï´Ù.");
+                Debug.LogWarning($"{pitchRangeObj.name}ì—ì„œ í¬ê¸°ë¥¼ ê°€ì ¸ì˜¬ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. ê¸°ë³¸ í¬ê¸°ë¥¼ ì‚¬ìš©í•©ë‹ˆë‹¤.");
             }
         }
 
@@ -294,11 +294,11 @@ public class BallSpawner : MonoBehaviour
     }
 
     /**
-     * Æ¯Á¤ ±¸Á¾¿¡ ´ëÇÑ ·£´ı À§Ä¡ ¼³Á¤
+     * íŠ¹ì • êµ¬ì¢…ì— ëŒ€í•œ ëœë¤ ìœ„ì¹˜ ì„¤ì •
      */
     private void SetRandomTargetPForPitchType(string pitchType)
     {
-        // ÇØ´ç ±¸Á¾ÀÇ PitchRange µ¥ÀÌÅÍ °¡Á®¿À±â
+        // í•´ë‹¹ êµ¬ì¢…ì˜ PitchRange ë°ì´í„° ê°€ì ¸ì˜¤ê¸°
         PitchRangeData rangeData;
         if (!pitchRangeDataMap.TryGetValue(pitchType, out rangeData))
         {
@@ -306,15 +306,15 @@ public class BallSpawner : MonoBehaviour
 
             if (debugMode && logRandomGeneration)
             {
-                Debug.LogWarning($"{pitchType}ÀÇ PitchRange µ¥ÀÌÅÍ°¡ ¾ø¾î ±âº»°ª »ç¿ë");
+                Debug.LogWarning($"{pitchType}ì˜ PitchRange ë°ì´í„°ê°€ ì—†ì–´ ê¸°ë³¸ê°’ ì‚¬ìš©");
             }
         }
 
-        // PitchRangeÀÇ ³Êºñ¿Í ³ôÀÌÀÇ Àı¹İÀ» ¿ÀÇÁ¼Â ÃÖ´ë°ªÀ¸·Î »ç¿ë (X, YÃà¸¸)
+        // PitchRangeì˜ ë„ˆë¹„ì™€ ë†’ì´ì˜ ì ˆë°˜ì„ ì˜¤í”„ì…‹ ìµœëŒ€ê°’ìœ¼ë¡œ ì‚¬ìš© (X, Yì¶•ë§Œ)
         float maxOffsetX = rangeData.size.x * 0.5f;
         float maxOffsetY = rangeData.size.y * 0.5f;
 
-        // ÇØ´ç ±¸Á¾ÀÇ PitchRange ³»¿¡¼­ ¹«ÀÛÀ§ À§Ä¡ ¼±ÅÃ
+        // í•´ë‹¹ êµ¬ì¢…ì˜ PitchRange ë‚´ì—ì„œ ë¬´ì‘ìœ„ ìœ„ì¹˜ ì„ íƒ
         randomTargetP = new Vector3(
             rangeData.position.x + Random.Range(-maxOffsetX, maxOffsetX),
             rangeData.position.y + Random.Range(-maxOffsetY, maxOffsetY),
@@ -323,17 +323,17 @@ public class BallSpawner : MonoBehaviour
 
         if (debugMode && logRandomGeneration)
         {
-            Debug.Log($"{pitchType} ·£´ı Å¸°Ù À§Ä¡: {randomTargetP} (¹üÀ§: X ¡¾{maxOffsetX:F2}, Y ¡¾{maxOffsetY:F2})");
+            Debug.Log($"{pitchType} ëœë¤ íƒ€ê²Ÿ ìœ„ì¹˜: {randomTargetP} (ë²”ìœ„: X Â±{maxOffsetX:F2}, Y Â±{maxOffsetY:F2})");
         }
     }
 
     /** 
-     * PitchRange ¿ÀºêÁ§Æ® ÃÊ±âÈ­ ¸Ş¼­µå
-     * PitchRange ¿ÀºêÁ§Æ®ÀÇ Áß½É À§Ä¡¿Í Å©±â¸¦ °¡Á®¿É´Ï´Ù.
+     * PitchRange ì˜¤ë¸Œì íŠ¸ ì´ˆê¸°í™” ë©”ì„œë“œ
+     * PitchRange ì˜¤ë¸Œì íŠ¸ì˜ ì¤‘ì‹¬ ìœ„ì¹˜ì™€ í¬ê¸°ë¥¼ ê°€ì ¸ì˜µë‹ˆë‹¤.
      */
     private void InitializePitchRange()
     {
-        // PitchRange ¿ÀºêÁ§Æ®°¡ ¼³Á¤µÇÁö ¾ÊÀº °æ¿ì Ã£¾Æº¸±â
+        // PitchRange ì˜¤ë¸Œì íŠ¸ê°€ ì„¤ì •ë˜ì§€ ì•Šì€ ê²½ìš° ì°¾ì•„ë³´ê¸°
         if (pitchRangeObject == null)
         {
             pitchRangeObject = GameObject.Find("PitchRange");
@@ -341,7 +341,7 @@ public class BallSpawner : MonoBehaviour
             {
                 if (debugMode)
                 {
-                    Debug.LogWarning("PitchRange ¿ÀºêÁ§Æ®¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù. ±âº» À§Ä¡°ªÀ» »ç¿ëÇÕ´Ï´Ù.");
+                    Debug.LogWarning("PitchRange ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. ê¸°ë³¸ ìœ„ì¹˜ê°’ì„ ì‚¬ìš©í•©ë‹ˆë‹¤.");
                 }
                 initialTargetP = new Vector3(5f, 0.822f, -1.81f);
                 pitchRangeSize = new Vector3(0.3f, 0.3f, 0f);
@@ -349,77 +349,77 @@ public class BallSpawner : MonoBehaviour
             }
         }
 
-        // PitchRangeÀÇ À§Ä¡¿Í Å©±â °¡Á®¿À±â
+        // PitchRangeì˜ ìœ„ì¹˜ì™€ í¬ê¸° ê°€ì ¸ì˜¤ê¸°
         initialTargetP = pitchRangeObject.transform.position;
 
-        // Collider³ª Renderer·ÎºÎÅÍ ¿ÀºêÁ§Æ® Å©±â ¾ò±â
+        // Colliderë‚˜ Rendererë¡œë¶€í„° ì˜¤ë¸Œì íŠ¸ í¬ê¸° ì–»ê¸°
         Collider rangeCollider = pitchRangeObject.GetComponent<Collider>();
         Renderer rangeRenderer = pitchRangeObject.GetComponent<Renderer>();
 
         if (rangeCollider != null)
         {
-            // ColliderÀÇ bounds Å©±â »ç¿ë
+            // Colliderì˜ bounds í¬ê¸° ì‚¬ìš©
             pitchRangeSize = rangeCollider.bounds.size;
         }
         else if (rangeRenderer != null)
         {
-            // RendererÀÇ bounds Å©±â »ç¿ë
+            // Rendererì˜ bounds í¬ê¸° ì‚¬ìš©
             pitchRangeSize = rangeRenderer.bounds.size;
         }
         else
         {
-            // ±âº» Å©±â ¼³Á¤
+            // ê¸°ë³¸ í¬ê¸° ì„¤ì •
             pitchRangeSize = new Vector3(0.3f, 0.3f, 0f);
 
             if (debugMode)
             {
-                Debug.LogWarning("PitchRange ¿ÀºêÁ§Æ®¿¡¼­ Å©±â¸¦ °¡Á®¿Ã ¼ö ¾ø½À´Ï´Ù. ±âº» Å©±â¸¦ »ç¿ëÇÕ´Ï´Ù.");
+                Debug.LogWarning("PitchRange ì˜¤ë¸Œì íŠ¸ì—ì„œ í¬ê¸°ë¥¼ ê°€ì ¸ì˜¬ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. ê¸°ë³¸ í¬ê¸°ë¥¼ ì‚¬ìš©í•©ë‹ˆë‹¤.");
             }
         }
 
         if (debugMode)
         {
-            Debug.Log($"±âº» PitchRange ÃÊ±âÈ­: À§Ä¡={initialTargetP}, Å©±â={pitchRangeSize}");
+            Debug.Log($"ê¸°ë³¸ PitchRange ì´ˆê¸°í™”: ìœ„ì¹˜={initialTargetP}, í¬ê¸°={pitchRangeSize}");
         }
     }
 
     /**
-     * ¹öÆ°¿¡ ÀÌº¥Æ® ¸®½º³Ê¸¦ ¿¬°áÇÏ´Â ¸Ş¼­µå
-     * °¢ ¹öÆ°ÀÌ ´­·ÈÀ» ¶§ ÇØ´ç ±â´ÉÀ» ½ÇÇàÇÕ´Ï´Ù.
+     * ë²„íŠ¼ì— ì´ë²¤íŠ¸ ë¦¬ìŠ¤ë„ˆë¥¼ ì—°ê²°í•˜ëŠ” ë©”ì„œë“œ
+     * ê° ë²„íŠ¼ì´ ëˆŒë ¸ì„ ë•Œ í•´ë‹¹ ê¸°ëŠ¥ì„ ì‹¤í–‰í•©ë‹ˆë‹¤.
      */
     private void AttachButtonListeners()
     {
-        // ±¸Á¾ ¼±ÅÃ ¹öÆ°
+        // êµ¬ì¢… ì„ íƒ ë²„íŠ¼
         AttachUIButton(fastballButton, () => SelectPitchType(pitchSettingsManager.fastballSettings));
         AttachUIButton(sliderButton, () => SelectPitchType(pitchSettingsManager.sliderSettings));
         AttachUIButton(curveButton, () => SelectPitchType(pitchSettingsManager.curveSettings));
         AttachUIButton(changeupButton, () => SelectPitchType(pitchSettingsManager.changeupSettings));
 
-        // ³ÎÅ¬º¼ ¹öÆ°Àº ¿äÃ»¿¡ µû¶ó ºñÈ°¼ºÈ­
+        // ë„í´ë³¼ ë²„íŠ¼ì€ ìš”ì²­ì— ë”°ë¼ ë¹„í™œì„±í™”
         if (knuckleballButton != null)
             knuckleballButton.gameObject.SetActive(false);
 
-        // ¼Óµµ Á¶Àı ¹× ¸ğµå ¹öÆ°
+        // ì†ë„ ì¡°ì ˆ ë° ëª¨ë“œ ë²„íŠ¼
         AttachUIButton(increaseSpeedButton, IncreaseSpeed);
         AttachUIButton(decreaseSpeedButton, DecreaseSpeed);
         AttachUIButton(randomModeButton, ToggleRandomMode);
     }
 
     /**
-     * ¹öÆ° ¿ÀºêÁ§Æ®¿¡ ±â´ÉÀ» ¿¬°áÇÏ´Â À¯Æ¿¸®Æ¼ ¸Ş¼­µå
+     * ë²„íŠ¼ ì˜¤ë¸Œì íŠ¸ì— ê¸°ëŠ¥ì„ ì—°ê²°í•˜ëŠ” ìœ í‹¸ë¦¬í‹° ë©”ì„œë“œ
      */
     private void AttachUIButton(Button button, UnityAction onClickAction)
     {
         if (button == null)
             return;
 
-        // ±âÁ¸ ¸®½º³Ê Á¦°Å ÈÄ »õ·Î Ãß°¡
+        // ê¸°ì¡´ ë¦¬ìŠ¤ë„ˆ ì œê±° í›„ ìƒˆë¡œ ì¶”ê°€
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(onClickAction);
     }
 
     /**
-     * ±¸Á¾ À¯ÇüÀ» ¼±ÅÃÇÏ´Â ¸Ş¼­µå
+     * êµ¬ì¢… ìœ í˜•ì„ ì„ íƒí•˜ëŠ” ë©”ì„œë“œ
      */
     private void SelectPitchType(List<BallSettings> pitchSettings)
     {
@@ -430,13 +430,13 @@ public class BallSpawner : MonoBehaviour
     }
 
     /**
-     * ·£´ı ¸ğµå¸¦ ÄÑ°í ²ô´Â ¸Ş¼­µå
+     * ëœë¤ ëª¨ë“œë¥¼ ì¼œê³  ë„ëŠ” ë©”ì„œë“œ
      */
     private void ToggleRandomMode()
     {
         isRandomMode = !isRandomMode;
 
-        // ·£´ı ¸ğµå¿¡¼­´Â ÃÖ¼Ò ¼Óµµ°¡ 90km/h¿©¾ß ÇÔ
+        // ëœë¤ ëª¨ë“œì—ì„œëŠ” ìµœì†Œ ì†ë„ê°€ 90km/hì—¬ì•¼ í•¨
         if (isRandomMode && speedValues[speedIndex] < 90)
         {
             speedIndex = System.Array.IndexOf(speedValues, 90);
@@ -446,7 +446,7 @@ public class BallSpawner : MonoBehaviour
     }
 
     /**
-     * ¼Óµµ¸¦ Áõ°¡½ÃÅ°´Â ¸Ş¼­µå
+     * ì†ë„ë¥¼ ì¦ê°€ì‹œí‚¤ëŠ” ë©”ì„œë“œ
      */
     private void IncreaseSpeed()
     {
@@ -455,7 +455,7 @@ public class BallSpawner : MonoBehaviour
             speedIndex++;
         }
 
-        // ·£´ı ¸ğµå¿¡¼­´Â ÃÖ¼Ò ¼Óµµ°¡ 90km/h¿©¾ß ÇÔ
+        // ëœë¤ ëª¨ë“œì—ì„œëŠ” ìµœì†Œ ì†ë„ê°€ 90km/hì—¬ì•¼ í•¨
         if (isRandomMode && speedValues[speedIndex] < 90)
         {
             speedIndex = System.Array.IndexOf(speedValues, 90);
@@ -465,7 +465,7 @@ public class BallSpawner : MonoBehaviour
     }
 
     /**
-     * ¼Óµµ¸¦ °¨¼Ò½ÃÅ°´Â ¸Ş¼­µå
+     * ì†ë„ë¥¼ ê°ì†Œì‹œí‚¤ëŠ” ë©”ì„œë“œ
      */
     private void DecreaseSpeed()
     {
@@ -474,7 +474,7 @@ public class BallSpawner : MonoBehaviour
             speedIndex--;
         }
 
-        // ·£´ı ¸ğµå¿¡¼­´Â ÃÖ¼Ò ¼Óµµ°¡ 90km/h¿©¾ß ÇÔ
+        // ëœë¤ ëª¨ë“œì—ì„œëŠ” ìµœì†Œ ì†ë„ê°€ 90km/hì—¬ì•¼ í•¨
         if (isRandomMode && speedValues[speedIndex] < 90)
         {
             speedIndex = System.Array.IndexOf(speedValues, 90);
@@ -484,7 +484,7 @@ public class BallSpawner : MonoBehaviour
     }
 
     /**
-     * ±¸Á¾ÀÇ ÀÌ¸§À» ¹İÈ¯ÇÏ´Â ¸Ş¼­µå
+     * êµ¬ì¢…ì˜ ì´ë¦„ì„ ë°˜í™˜í•˜ëŠ” ë©”ì„œë“œ
      */
     private string GetPitchTypeName(BallSettings settings)
     {
@@ -504,24 +504,24 @@ public class BallSpawner : MonoBehaviour
     }
 
     /**
-     * ¾Ö´Ï¸ŞÀÌ¼Ç ±â¹İÀÇ Åõ±¸ ½ÃÄö½º¸¦ Á¦¾îÇÏ´Â ÄÚ·çÆ¾
-     * ÁÖ±âÀûÀ¸·Î Åõ±¸ ¾Ö´Ï¸ŞÀÌ¼ÇÀ» ½ÃÀÛÇÏ°í ¾Ö´Ï¸ŞÀÌ¼Ç ÀÌº¥Æ®¸¦ ÅëÇØ °øÀ» ¹ß»çÇÕ´Ï´Ù.
+     * ì• ë‹ˆë©”ì´ì…˜ ê¸°ë°˜ì˜ íˆ¬êµ¬ ì‹œí€€ìŠ¤ë¥¼ ì œì–´í•˜ëŠ” ì½”ë£¨í‹´
+     * ì£¼ê¸°ì ìœ¼ë¡œ íˆ¬êµ¬ ì• ë‹ˆë©”ì´ì…˜ì„ ì‹œì‘í•˜ê³  ì• ë‹ˆë©”ì´ì…˜ ì´ë²¤íŠ¸ë¥¼ í†µí•´ ê³µì„ ë°œì‚¬í•©ë‹ˆë‹¤.
      */
     private IEnumerator AnimatedPitchingSequence()
     {
-        yield return new WaitForSeconds(1.0f); // ÃÊ±â ´ë±â ½Ã°£
+        yield return new WaitForSeconds(1.0f); // ì´ˆê¸° ëŒ€ê¸° ì‹œê°„
 
         while (true)
         {
-            // ´ÙÀ½ Åõ±¸¸¦ À§ÇÑ ´ë±â
+            // ë‹¤ìŒ íˆ¬êµ¬ë¥¼ ìœ„í•œ ëŒ€ê¸°
             waitingToSpawn = true;
             yield return new WaitForSeconds(pitchDelay);
             waitingToSpawn = false;
 
-            // Åõ±¸ ¾Ö´Ï¸ŞÀÌ¼Ç ½ÃÀÛ
+            // íˆ¬êµ¬ ì• ë‹ˆë©”ì´ì…˜ ì‹œì‘
             TriggerPitchAnimation();
 
-            // ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ ¿Ï·áµÉ ¶§±îÁö ´ë±â
+            // ì• ë‹ˆë©”ì´ì…˜ì´ ì™„ë£Œë  ë•Œê¹Œì§€ ëŒ€ê¸°
             while (isAnimationInProgress)
             {
                 yield return null;
@@ -530,7 +530,7 @@ public class BallSpawner : MonoBehaviour
     }
 
     /**
-     * ÇöÀç ¼±ÅÃµÈ ±¸Á¾¿¡ µû¶ó ÀûÀıÇÑ Åõ±¸ ¾Ö´Ï¸ŞÀÌ¼ÇÀ» ½ÃÀÛÇÏ´Â ¸Ş¼­µå
+     * í˜„ì¬ ì„ íƒëœ êµ¬ì¢…ì— ë”°ë¼ ì ì ˆí•œ íˆ¬êµ¬ ì• ë‹ˆë©”ì´ì…˜ì„ ì‹œì‘í•˜ëŠ” ë©”ì„œë“œ
      */
     private void TriggerPitchAnimation()
     {
@@ -539,12 +539,12 @@ public class BallSpawner : MonoBehaviour
 
         isAnimationInProgress = true;
 
-        // Åõ±¸ ¼³Á¤ ¹× Å¸ÀÔ °áÁ¤
+        // íˆ¬êµ¬ ì„¤ì • ë° íƒ€ì… ê²°ì •
         pendingBallSettings = isRandomMode ? GetRandomBallSettings() :
                              currentPitchSettings[speedIndex % currentPitchSettings.Count];
         pendingPitchType = GetPitchTypeName(pendingBallSettings);
 
-        // ¸ğµå¿¡ µû¶ó ¸ñÇ¥ À§Ä¡ °áÁ¤
+        // ëª¨ë“œì— ë”°ë¼ ëª©í‘œ ìœ„ì¹˜ ê²°ì •
         if (isRandomMode)
         {
             SetRandomTargetPForPitchType(pendingPitchType);
@@ -554,34 +554,34 @@ public class BallSpawner : MonoBehaviour
             ResetTargetP();
         }
 
-        // ÁØºñ ÀÚ¼¼ ¾Ö´Ï¸ŞÀÌ¼Ç ½ÇÇà
+        // ì¤€ë¹„ ìì„¸ ì• ë‹ˆë©”ì´ì…˜ ì‹¤í–‰
         pitcherAnimator.SetTrigger(readyAnimTrigger);
 
-        // ±¸Á¾¿¡ ¸Â´Â Åõ±¸ ¾Ö´Ï¸ŞÀÌ¼Ç ½ÇÇà
+        // êµ¬ì¢…ì— ë§ëŠ” íˆ¬êµ¬ ì• ë‹ˆë©”ì´ì…˜ ì‹¤í–‰
         int animIndex = GetAnimationIndexForPitchType(pendingPitchType);
 
-        // ¾Ö´Ï¸ŞÀÌ¼Ç Æ®¸®°Å ½ÇÇà
+        // ì• ë‹ˆë©”ì´ì…˜ íŠ¸ë¦¬ê±° ì‹¤í–‰
         if (animIndex < pitchAnimTriggers.Length)
         {
             pitcherAnimator.SetTrigger(pitchAnimTriggers[animIndex]);
 
             if (debugMode && logAnimationEvents)
             {
-                Debug.Log($"{pendingPitchType} Åõ±¸ ¾Ö´Ï¸ŞÀÌ¼Ç ½ÃÀÛ (Æ®¸®°Å: {pitchAnimTriggers[animIndex]})");
+                Debug.Log($"{pendingPitchType} íˆ¬êµ¬ ì• ë‹ˆë©”ì´ì…˜ ì‹œì‘ (íŠ¸ë¦¬ê±°: {pitchAnimTriggers[animIndex]})");
             }
         }
         else
         {
             if (debugMode)
             {
-                Debug.LogError($"¾Ö´Ï¸ŞÀÌ¼Ç Æ®¸®°Å°¡ ¼³Á¤µÇÁö ¾Ê¾Ò½À´Ï´Ù. (±¸Á¾: {pendingPitchType})");
+                Debug.LogError($"ì• ë‹ˆë©”ì´ì…˜ íŠ¸ë¦¬ê±°ê°€ ì„¤ì •ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤. (êµ¬ì¢…: {pendingPitchType})");
             }
             isAnimationInProgress = false;
         }
     }
 
     /**
-     * ±¸Á¾¿¡ µû¸¥ ¾Ö´Ï¸ŞÀÌ¼Ç ÀÎµ¦½º ¹İÈ¯
+     * êµ¬ì¢…ì— ë”°ë¥¸ ì• ë‹ˆë©”ì´ì…˜ ì¸ë±ìŠ¤ ë°˜í™˜
      */
     private int GetAnimationIndexForPitchType(string pitchType)
     {
@@ -591,58 +591,58 @@ public class BallSpawner : MonoBehaviour
             case "Slider": return 1;
             case "Curve": return 2;
             case "Changeup": return 3;
-            default: return 0; // ±âº»°ªÀº ÆĞ½ºÆ®º¼
+            default: return 0; // ê¸°ë³¸ê°’ì€ íŒ¨ìŠ¤íŠ¸ë³¼
         }
     }
 
     /**
-     * ¾Ö´Ï¸ŞÀÌ¼Ç ÀÌº¥Æ®¿¡¼­ È£ÃâµÇ´Â °ø ¹ß»ç ¸Ş¼­µå
-     * ¾Ö´Ï¸ŞÀÌ¼ÇÀÇ Æ¯Á¤ ÇÁ·¹ÀÓ¿¡¼­ ÀÌ ¸Ş¼­µå¸¦ È£ÃâÇÏ¿© °øÀ» »ı¼ºÇÏ°í ¹ß»çÇÕ´Ï´Ù.
+     * ì• ë‹ˆë©”ì´ì…˜ ì´ë²¤íŠ¸ì—ì„œ í˜¸ì¶œë˜ëŠ” ê³µ ë°œì‚¬ ë©”ì„œë“œ
+     * ì• ë‹ˆë©”ì´ì…˜ì˜ íŠ¹ì • í”„ë ˆì„ì—ì„œ ì´ ë©”ì„œë“œë¥¼ í˜¸ì¶œí•˜ì—¬ ê³µì„ ìƒì„±í•˜ê³  ë°œì‚¬í•©ë‹ˆë‹¤.
      */
     public void OnAnimationReleaseBall()
     {
-        // °ø »ı¼º
+        // ê³µ ìƒì„±
         GameObject ball = Instantiate(ballPrefab, releasePoint.position, releasePoint.rotation);
 
-        // °ø¿¡ ¼³Á¤ Àû¿ë
+        // ê³µì— ì„¤ì • ì ìš©
         ApplyBallSettings(ball);
 
-        // ÀÏÁ¤ ½Ã°£ ÈÄ °ø Á¦°Å
+        // ì¼ì • ì‹œê°„ í›„ ê³µ ì œê±°
         StartCoroutine(DestroyBallAfterTime(ball, destroyTime));
 
         if (debugMode && logBallInfo)
         {
-            Debug.Log($"{pendingPitchType} °øÀÌ »ı¼ºµÇ°í ¹ß»çµÇ¾ú½À´Ï´Ù. ¼Óµµ: {pendingBallSettings.throwPower * 0.36f:F1}km/h");
+            Debug.Log($"{pendingPitchType} ê³µì´ ìƒì„±ë˜ê³  ë°œì‚¬ë˜ì—ˆìŠµë‹ˆë‹¤. ì†ë„: {pendingBallSettings.throwPower * 0.36f:F1}km/h");
         }
     }
 
     /**
-     * »ı¼ºµÈ °ø¿¡ ¼³Á¤ Àû¿ë
+     * ìƒì„±ëœ ê³µì— ì„¤ì • ì ìš©
      */
     private void ApplyBallSettings(GameObject ball)
     {
-        // BallController ÄÄÆ÷³ÍÆ® È®ÀÎ
+        // BallController ì»´í¬ë„ŒíŠ¸ í™•ì¸
         BallController ballController = ball.GetComponent<BallController>();
         if (ballController != null)
         {
-            // ¼³Á¤ Àû¿ë
+            // ì„¤ì • ì ìš©
             ballController.SetBallSettings(pendingBallSettings);
             ballController.SetPitchType(pendingPitchType);
 
-            // ¹ß»ç ¹æÇâ °è»ê ¹× ¹ß»ç
+            // ë°œì‚¬ ë°©í–¥ ê³„ì‚° ë° ë°œì‚¬
             ballController.CalculateDirection(releasePoint.position, isRandomMode ? randomTargetP : initialTargetP);
             ballController.LaunchBall();
             StartCoroutine(CheckBallHit(ballController));
         }
         else if (debugMode)
         {
-            Debug.LogError("º¼ ÇÁ¸®ÆÕ¿¡ BallController ÄÄÆ÷³ÍÆ®°¡ ¾ø½À´Ï´Ù!");
+            Debug.LogError("ë³¼ í”„ë¦¬íŒ¹ì— BallController ì»´í¬ë„ŒíŠ¸ê°€ ì—†ìŠµë‹ˆë‹¤!");
         }
     }
 
     /**
-     * ¾Ö´Ï¸ŞÀÌ¼Ç ÀÌº¥Æ®¿¡¼­ È£ÃâµÇ´Â ¾Ö´Ï¸ŞÀÌ¼Ç ¿Ï·á ¸Ş¼­µå
-     * ¾Ö´Ï¸ŞÀÌ¼ÇÀÇ ¸¶Áö¸· ÇÁ·¹ÀÓ¿¡¼­ ÀÌ ¸Ş¼­µå¸¦ È£ÃâÇÏ¿© ´ÙÀ½ Åõ±¸¸¦ ÁØºñÇÕ´Ï´Ù.
+     * ì• ë‹ˆë©”ì´ì…˜ ì´ë²¤íŠ¸ì—ì„œ í˜¸ì¶œë˜ëŠ” ì• ë‹ˆë©”ì´ì…˜ ì™„ë£Œ ë©”ì„œë“œ
+     * ì• ë‹ˆë©”ì´ì…˜ì˜ ë§ˆì§€ë§‰ í”„ë ˆì„ì—ì„œ ì´ ë©”ì„œë“œë¥¼ í˜¸ì¶œí•˜ì—¬ ë‹¤ìŒ íˆ¬êµ¬ë¥¼ ì¤€ë¹„í•©ë‹ˆë‹¤.
      */
     public void OnAnimationComplete()
     {
@@ -650,16 +650,16 @@ public class BallSpawner : MonoBehaviour
 
         if (debugMode && logAnimationEvents)
         {
-            Debug.Log("Åõ±¸ ¾Ö´Ï¸ŞÀÌ¼Ç ¿Ï·á");
+            Debug.Log("íˆ¬êµ¬ ì• ë‹ˆë©”ì´ì…˜ ì™„ë£Œ");
         }
     }
 
     /**
-     * ¸ñÇ¥ À§Ä¡¸¦ PitchRange ¿ÀºêÁ§Æ®ÀÇ Áß½ÉÀ¸·Î Àç¼³Á¤ÇÏ´Â ¸Ş¼­µå
+     * ëª©í‘œ ìœ„ì¹˜ë¥¼ PitchRange ì˜¤ë¸Œì íŠ¸ì˜ ì¤‘ì‹¬ìœ¼ë¡œ ì¬ì„¤ì •í•˜ëŠ” ë©”ì„œë“œ
      */
     private void ResetTargetP()
     {
-        // PitchRange ¿ÀºêÁ§Æ®ÀÇ À§Ä¡°¡ º¯°æµÇ¾úÀ» ¼ö ÀÖÀ¸¹Ç·Î ÇöÀç À§Ä¡ È®ÀÎ
+        // PitchRange ì˜¤ë¸Œì íŠ¸ì˜ ìœ„ì¹˜ê°€ ë³€ê²½ë˜ì—ˆì„ ìˆ˜ ìˆìœ¼ë¯€ë¡œ í˜„ì¬ ìœ„ì¹˜ í™•ì¸
         if (pitchRangeObject != null)
         {
             initialTargetP = pitchRangeObject.transform.position;
@@ -669,13 +669,13 @@ public class BallSpawner : MonoBehaviour
 
         if (debugMode && logRandomGeneration)
         {
-            Debug.Log($"Å¸°Ù À§Ä¡ Àç¼³Á¤: {initialTargetP}");
+            Debug.Log($"íƒ€ê²Ÿ ìœ„ì¹˜ ì¬ì„¤ì •: {initialTargetP}");
         }
     }
 
     /**
-     * ·£´ı ¸ğµå¿¡¼­ ¹«ÀÛÀ§ °ø ¼³Á¤À» »ı¼ºÇÏ´Â ¸Ş¼­µå
-     * °¢ ±¸Á¾¸¶´Ù ´Ù¸¥ È®·ü·Î ¼±ÅÃµÇ¸ç, ¼Óµµµµ Á¶Á¤µË´Ï´Ù.
+     * ëœë¤ ëª¨ë“œì—ì„œ ë¬´ì‘ìœ„ ê³µ ì„¤ì •ì„ ìƒì„±í•˜ëŠ” ë©”ì„œë“œ
+     * ê° êµ¬ì¢…ë§ˆë‹¤ ë‹¤ë¥¸ í™•ë¥ ë¡œ ì„ íƒë˜ë©°, ì†ë„ë„ ì¡°ì •ë©ë‹ˆë‹¤.
      */
     private BallSettings GetRandomBallSettings()
     {
@@ -683,49 +683,49 @@ public class BallSpawner : MonoBehaviour
         int randomSpeed = speedValues[speedIndex];
         List<BallSettings> possibleSettings = new List<BallSettings>();
 
-        // È®·ü¿¡ µû¶ó ´Ù¸¥ ±¸Á¾ ¼±ÅÃ
+        // í™•ë¥ ì— ë”°ë¼ ë‹¤ë¥¸ êµ¬ì¢… ì„ íƒ
         if (randomValue < 40) // Fastball 40%
         {
             possibleSettings = FindSettingsForSpeedAndType(randomSpeed, pitchSettingsManager.fastballSettings, "Fastball");
         }
         else if (randomValue < 60) // Changeup 20%
         {
-            randomSpeed -= 10; // Ã¼ÀÎÁö¾÷Àº ¼Óµµ °¨¼Ò
+            randomSpeed -= 10; // ì²´ì¸ì§€ì—…ì€ ì†ë„ ê°ì†Œ
             possibleSettings = FindSettingsForSpeedAndType(randomSpeed, pitchSettingsManager.changeupSettings, "Changeup");
         }
         else if (randomValue < 80) // Slider 20%
         {
-            randomSpeed -= 10; // ½½¶óÀÌ´õ´Â ¼Óµµ °¨¼Ò
+            randomSpeed -= 10; // ìŠ¬ë¼ì´ë”ëŠ” ì†ë„ ê°ì†Œ
             possibleSettings = FindSettingsForSpeedAndType(randomSpeed, pitchSettingsManager.sliderSettings, "Slider");
         }
         else // Curve 20%
         {
-            randomSpeed -= 20; // Ä¿ºê´Â ¼Óµµ Å©°Ô °¨¼Ò
+            randomSpeed -= 20; // ì»¤ë¸ŒëŠ” ì†ë„ í¬ê²Œ ê°ì†Œ
             possibleSettings = FindSettingsForSpeedAndType(randomSpeed, pitchSettingsManager.curveSettings, "Curve");
         }
 
-        // °¡´ÉÇÑ ¼³Á¤µé Áß¿¡¼­ ·£´ı ¼±ÅÃ
+        // ê°€ëŠ¥í•œ ì„¤ì •ë“¤ ì¤‘ì—ì„œ ëœë¤ ì„ íƒ
         if (possibleSettings.Count == 0)
         {
             if (debugMode && logRandomGeneration)
             {
-                Debug.LogWarning("·£´ı ¸ğµå¿¡¼­ ÀûÇÕÇÑ ¼³Á¤À» Ã£Áö ¸øÇß½À´Ï´Ù. ±âº»°ª »ç¿ë");
+                Debug.LogWarning("ëœë¤ ëª¨ë“œì—ì„œ ì í•©í•œ ì„¤ì •ì„ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤. ê¸°ë³¸ê°’ ì‚¬ìš©");
             }
-            return pitchSettingsManager.fastballSettings[0]; // ±âº»°ª »ç¿ë
+            return pitchSettingsManager.fastballSettings[0]; // ê¸°ë³¸ê°’ ì‚¬ìš©
         }
 
         BallSettings selectedSettings = possibleSettings[Random.Range(0, possibleSettings.Count)];
 
         if (debugMode && logRandomGeneration)
         {
-            Debug.Log($"·£´ı ¼³Á¤ ¼±ÅÃ: {GetPitchTypeName(selectedSettings)}, ¼Óµµ: {selectedSettings.throwPower * 0.36f:F1}km/h");
+            Debug.Log($"ëœë¤ ì„¤ì • ì„ íƒ: {GetPitchTypeName(selectedSettings)}, ì†ë„: {selectedSettings.throwPower * 0.36f:F1}km/h");
         }
 
         return selectedSettings;
     }
 
     /**
-     * Æ¯Á¤ ¼Óµµ¿Í ±¸Á¾¿¡ ´ëÇÑ ¼³Á¤ Ã£±â
+     * íŠ¹ì • ì†ë„ì™€ êµ¬ì¢…ì— ëŒ€í•œ ì„¤ì • ì°¾ê¸°
      */
     private List<BallSettings> FindSettingsForSpeedAndType(int targetSpeed, List<BallSettings> typeSettings, string typeName)
     {
@@ -741,18 +741,18 @@ public class BallSpawner : MonoBehaviour
 
         if (result.Count == 0 && debugMode && logRandomGeneration)
         {
-            Debug.LogWarning($"{typeName} ±¸Á¾¿¡¼­ ¼Óµµ {targetSpeed}km/h¿¡ ¸Â´Â ¼³Á¤À» Ã£Áö ¸øÇß½À´Ï´Ù.");
+            Debug.LogWarning($"{typeName} êµ¬ì¢…ì—ì„œ ì†ë„ {targetSpeed}km/hì— ë§ëŠ” ì„¤ì •ì„ ì°¾ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.");
         }
 
         return result;
     }
 
     /**
-     * °øÀÇ Ãæµ¹ ¿©ºÎ¸¦ È®ÀÎÇÏ´Â ÄÚ·çÆ¾
+     * ê³µì˜ ì¶©ëŒ ì—¬ë¶€ë¥¼ í™•ì¸í•˜ëŠ” ì½”ë£¨í‹´
      */
     private IEnumerator CheckBallHit(BallController ballController)
     {
-        // Ãæµ¹ È®ÀÎ
+        // ì¶©ëŒ í™•ì¸
         while (!ballController.hasCollided)
         {
             yield return null;
@@ -760,12 +760,12 @@ public class BallSpawner : MonoBehaviour
 
         if (debugMode && logBallInfo)
         {
-            Debug.Log($"°ø Ãæµ¹ °¨Áö: {pendingPitchType}");
+            Debug.Log($"ê³µ ì¶©ëŒ ê°ì§€: {pendingPitchType}");
         }
     }
 
     /**
-     * ÀÏÁ¤ ½Ã°£ ÈÄ °øÀ» Á¦°ÅÇÏ´Â ÄÚ·çÆ¾
+     * ì¼ì • ì‹œê°„ í›„ ê³µì„ ì œê±°í•˜ëŠ” ì½”ë£¨í‹´
      */
     private IEnumerator DestroyBallAfterTime(GameObject ball, float time)
     {
@@ -777,24 +777,24 @@ public class BallSpawner : MonoBehaviour
 
             if (debugMode && logBallInfo)
             {
-                Debug.Log($"°ø ÀÚµ¿ Á¦°Å: {time}ÃÊ ÈÄ");
+                Debug.Log($"ê³µ ìë™ ì œê±°: {time}ì´ˆ í›„");
             }
         }
     }
 
     /**
-     * ÇöÀç ¼±ÅÃµÈ ±¸Á¾ ÀÌ¸§À» ¹İÈ¯ÇÏ´Â ¸Ş¼­µå
-     * @return ÇöÀç ±¸Á¾ ÀÌ¸§ (Fastball, Slider, Curve, Changeup µî)
+     * í˜„ì¬ ì„ íƒëœ êµ¬ì¢… ì´ë¦„ì„ ë°˜í™˜í•˜ëŠ” ë©”ì„œë“œ
+     * @return í˜„ì¬ êµ¬ì¢… ì´ë¦„ (Fastball, Slider, Curve, Changeup ë“±)
      */
     public string GetCurrentPitchTypeName()
     {
-        // ·£´ı ¸ğµåÀÌ¸é "Random"À» ¹İÈ¯
+        // ëœë¤ ëª¨ë“œì´ë©´ "Random"ì„ ë°˜í™˜
         if (isRandomMode)
         {
             return "Random";
         }
 
-        // ÇöÀç ¼±ÅÃµÈ ±¸Á¾ÀÇ ÀÌ¸§ °¡Á®¿À±â
+        // í˜„ì¬ ì„ íƒëœ êµ¬ì¢…ì˜ ì´ë¦„ ê°€ì ¸ì˜¤ê¸°
         if (currentPitchSettings == pitchSettingsManager.fastballSettings)
         {
             return "Fastball";
@@ -816,8 +816,8 @@ public class BallSpawner : MonoBehaviour
     }
 
     /**
-     * ÇöÀç ¼±ÅÃµÈ ±¸¼ÓÀ» ¹İÈ¯ÇÏ´Â ¸Ş¼­µå
-     * @return ÇöÀç ±¸¼Ó (km/h)
+     * í˜„ì¬ ì„ íƒëœ êµ¬ì†ì„ ë°˜í™˜í•˜ëŠ” ë©”ì„œë“œ
+     * @return í˜„ì¬ êµ¬ì† (km/h)
      */
     public int GetCurrentPitchSpeed()
     {
@@ -825,20 +825,20 @@ public class BallSpawner : MonoBehaviour
     }
 
     /**
-     * ÇöÀç ¼±ÅÃµÈ ±¸Á¾°ú ±¸¼Ó Á¤º¸¸¦ TextMeshPro·Î Ãâ·ÂÇÏ´Â ¸Ş¼­µå
+     * í˜„ì¬ ì„ íƒëœ êµ¬ì¢…ê³¼ êµ¬ì† ì •ë³´ë¥¼ TextMeshProë¡œ ì¶œë ¥í•˜ëŠ” ë©”ì„œë“œ
      */
     public void UpdatePitchInfoDisplay()
     {
         if (pitchInfoText == null)
             return;
 
-        // ÇöÀç ¼±ÅÃµÈ ±¸Á¾ ÀÌ¸§ °¡Á®¿À±â
+        // í˜„ì¬ ì„ íƒëœ êµ¬ì¢… ì´ë¦„ ê°€ì ¸ì˜¤ê¸°
         string currentPitchType = GetCurrentPitchTypeName();
 
-        // ÇöÀç ¼±ÅÃµÈ ±¸¼Ó °¡Á®¿À±â
+        // í˜„ì¬ ì„ íƒëœ êµ¬ì† ê°€ì ¸ì˜¤ê¸°
         int currentSpeed = speedValues[speedIndex];
 
-        // ·£´ı ¸ğµå »óÅÂ¿¡ µû¶ó ´Ù¸¥ ½ºÅ¸ÀÏ Àû¿ë
+        // ëœë¤ ëª¨ë“œ ìƒíƒœì— ë”°ë¼ ë‹¤ë¥¸ ìŠ¤íƒ€ì¼ ì ìš©
         if (isRandomMode)
         {
             pitchInfoText.text = string.Format("<color=#FF6B00>RandomMode</color>\n{0} km/h",
@@ -846,12 +846,12 @@ public class BallSpawner : MonoBehaviour
         }
         else
         {
-            // ±¸Á¾º° »ö»ó Àû¿ë (¼±ÅÃ»çÇ×)
-            string colorHex = "#FFFFFF"; // ±âº» Èò»ö
-            if (currentPitchType == "Fastball") colorHex = "#FF0000"; // »¡°­
-            else if (currentPitchType == "Slider") colorHex = "#00AAFF"; // ÆÄ¶û
-            else if (currentPitchType == "Curve") colorHex = "#00FF00"; // ÃÊ·Ï
-            else if (currentPitchType == "Changeup") colorHex = "#FFAA00"; // ÁÖÈ²
+            // êµ¬ì¢…ë³„ ìƒ‰ìƒ ì ìš© (ì„ íƒì‚¬í•­)
+            string colorHex = "#FFFFFF"; // ê¸°ë³¸ í°ìƒ‰
+            if (currentPitchType == "Fastball") colorHex = "#FF0000"; // ë¹¨ê°•
+            else if (currentPitchType == "Slider") colorHex = "#00AAFF"; // íŒŒë‘
+            else if (currentPitchType == "Curve") colorHex = "#00FF00"; // ì´ˆë¡
+            else if (currentPitchType == "Changeup") colorHex = "#FFAA00"; // ì£¼í™©
 
             pitchInfoText.text = string.Format("<color={0}>{1}</color>\n{2} km/h",
                 colorHex, currentPitchType, currentSpeed);
@@ -859,36 +859,36 @@ public class BallSpawner : MonoBehaviour
     }
 
     /**
-     * Å¸°Ù À§Ä¡¸¦ ½Ã°¢ÀûÀ¸·Î Ç¥½Ã
+     * íƒ€ê²Ÿ ìœ„ì¹˜ë¥¼ ì‹œê°ì ìœ¼ë¡œ í‘œì‹œ
      */
     private void OnDrawGizmos()
     {
         if (!showTargetGizmo || !Application.isPlaying)
             return;
 
-        // ÇöÀç Å¸°Ù À§Ä¡ Ç¥½Ã
+        // í˜„ì¬ íƒ€ê²Ÿ ìœ„ì¹˜ í‘œì‹œ
         Vector3 targetPos = isRandomMode ? randomTargetP : initialTargetP;
         Gizmos.color = targetGizmoColor;
         Gizmos.DrawSphere(targetPos, targetGizmoSize);
 
-        // µğ¹ö±× ¸ğµåÀÏ ¶§ Ãß°¡ Á¤º¸ Ç¥½Ã
+        // ë””ë²„ê·¸ ëª¨ë“œì¼ ë•Œ ì¶”ê°€ ì •ë³´ í‘œì‹œ
         if (debugMode)
         {
-            // °¢ ±¸Á¾º° ¹üÀ§ Ç¥½Ã
+            // ê° êµ¬ì¢…ë³„ ë²”ìœ„ í‘œì‹œ
             foreach (var entry in pitchRangeDataMap)
             {
                 if (entry.Key != "Default")
                 {
-                    // °¢ ±¸Á¾º°·Î ´Ù¸¥ Åõ¸íµµ·Î Ç¥½Ã
+                    // ê° êµ¬ì¢…ë³„ë¡œ ë‹¤ë¥¸ íˆ¬ëª…ë„ë¡œ í‘œì‹œ
                     Color rangeColor = targetGizmoColor;
                     rangeColor.a = 0.2f;
 
                     switch (entry.Key)
                     {
-                        case "Fastball": rangeColor = new Color(1f, 0f, 0f, 0.2f); break; // »¡°­
-                        case "Slider": rangeColor = new Color(0f, 0.5f, 1f, 0.2f); break; // ÆÄ¶û
-                        case "Curve": rangeColor = new Color(0f, 1f, 0f, 0.2f); break; // ÃÊ·Ï
-                        case "Changeup": rangeColor = new Color(1f, 0.5f, 0f, 0.2f); break; // ÁÖÈ²
+                        case "Fastball": rangeColor = new Color(1f, 0f, 0f, 0.2f); break; // ë¹¨ê°•
+                        case "Slider": rangeColor = new Color(0f, 0.5f, 1f, 0.2f); break; // íŒŒë‘
+                        case "Curve": rangeColor = new Color(0f, 1f, 0f, 0.2f); break; // ì´ˆë¡
+                        case "Changeup": rangeColor = new Color(1f, 0.5f, 0f, 0.2f); break; // ì£¼í™©
                     }
 
                     Gizmos.color = rangeColor;
