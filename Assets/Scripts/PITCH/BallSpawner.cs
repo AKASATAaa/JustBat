@@ -25,6 +25,8 @@ public class BallSpawner : MonoBehaviour
     [Tooltip("공 발사 위치")]
     public Transform releasePoint;
 
+    //
+
     [Header("애니메이션 설정")]
     [Tooltip("투수 애니메이터 컴포넌트")]
     public Animator pitcherAnimator;

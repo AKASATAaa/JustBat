@@ -38,7 +38,7 @@ public class BallController : MonoBehaviour
     [Tooltip("발사 후 감속 시작까지의 대기 시간 (초)")]
     [Range(0f, 5f)]
     public float brakingDelay;                     // 감속 시작 전 대기 시간
-
+      //
     [Header("물리 효과")]
     [Tooltip("공기 저항 상수")]
     public float airResistanceConstant = 0.02f;    // 공기 저항 계수
