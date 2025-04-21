@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -84,6 +84,15 @@ public class BatController : MonoBehaviour
     /// </summary>
     void Start()
     {
+
+        TrailRenderer trailRenderer = GetComponent<TrailRenderer>();
+        if (trailRenderer != null)
+        {
+            // 트레일 렌더러가 있는 경우 머티리얼 설정
+            ConfigureTrailRenderer(trailRenderer, 1.0f); // 기본 품질 1.0
+            trailRenderer.enabled = false; // 시작 시 비활성화
+            Debug.Log("시작 시 트레일 렌더러 구성됨");
+        }
         // 리지드바디 컴포넌트 가져오기
         batRigidbody = GetComponent<Rigidbody>();
 
@@ -312,6 +321,7 @@ public class BatController : MonoBehaviour
             // 공의 Rigidbody 가져오기
             Rigidbody ballRigidbody = ballCollider.GetComponent<Rigidbody>();
             BallController ballController = ballCollider.GetComponent<BallController>();
+            TeeBallController teeBallController = ballCollider.GetComponent<TeeBallController>();
 
             if (ballRigidbody != null)
             {
@@ -336,21 +346,17 @@ public class BatController : MonoBehaviour
                 float distanceToSweetSpot = vectorToSweetSpot.magnitude;
 
                 // 개선된 스윗스팟 효과 계산
+                // 품질 계수 계산
                 float qualityFactor;
-
-                // sweetSpotRadius 이내에 들어오면 무조건 1.0(최고 품질) 제공
                 if (distanceToSweetSpot <= sweetSpotRadius)
                 {
                     qualityFactor = 1.0f;
-                    Debug.Log("Perfect Hit! 스윗스팟 직접 타격");
                 }
                 else
                 {
-                    // sweetSpotRadius ~ sweetSpotMaxDistance 사이에서만 보간
                     float adjustedDistance = (distanceToSweetSpot - sweetSpotRadius) / (sweetSpotMaxDistance - sweetSpotRadius);
                     float normalizedDistance = Mathf.Clamp01(adjustedDistance);
                     qualityFactor = Mathf.Lerp(1.0f, minQualityFactor, normalizedDistance);
-                    Debug.Log($"스윗스팟에서 {distanceToSweetSpot:F3}m 거리에 타격. 품질: {qualityFactor:F2}");
                 }
 
                 // 또는 지수 감소 함수 사용 (더 현실적)
@@ -424,6 +430,59 @@ public class BatController : MonoBehaviour
                 if (ballController != null)
                 {
                     ballController.hasCollided = true;
+
+                    BallTrailController ballTrail = ballCollider.GetComponent<BallTrailController>();
+                    if (ballTrail == null)
+                    {
+                        // 없으면 추가
+                        ballTrail = ballCollider.gameObject.AddComponent<BallTrailController>();
+                        Debug.Log("공에 BallTrailController 컴포넌트 추가됨");
+                    }
+
+                    // 트레일 활성화 (타격 품질 전달)
+                    if (ballTrail != null)
+                    {
+                        ballTrail.ActivateTrail(qualityFactor);
+                        Debug.Log($"공 트레일 활성화: 품질={qualityFactor:F2}");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("공에 BallTrailController를 찾을 수 없습니다!");
+                    }
+                }
+
+                if (teeBallController != null)
+                {
+
+                    BallTrailController ballTrail = teeBallController.GetComponent<BallTrailController>();
+                    if (ballTrail == null)
+                    {
+                        // 없으면 추가
+                        ballTrail = teeBallController.gameObject.AddComponent<BallTrailController>();
+                        Debug.Log("공에 BallTrailController 컴포넌트 추가됨");
+                    }
+
+                    // 트레일 활성화 (타격 품질 전달)
+                    if (ballTrail != null)
+                    {
+                        ballTrail.ActivateTrail(qualityFactor);
+                        Debug.Log($"공 트레일 활성화: 품질={qualityFactor:F2}");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("공에 BallTrailController를 찾을 수 없습니다!");
+                    }
+                }
+
+                BatTrailFix trailFix = GetComponent<BatTrailFix>();
+                if (trailFix != null)
+                {
+                    trailFix.ActivateTrail(qualityFactor);
+                    Debug.Log($"BatTrailFix를 통해 트레일 활성화: 품질={qualityFactor}");
+                }
+                else
+                {
+                    Debug.LogWarning("BatTrailFix 컴포넌트를 찾을 수 없습니다.");
                 }
 
                 // 출구 속도 (km/h로 변환)
@@ -466,8 +525,111 @@ public class BatController : MonoBehaviour
                 // Rigidbody가 없는 경우
                 Debug.LogError("충돌한 공에 Rigidbody가 없습니다! 이름: " + ballCollider.gameObject.name);
             }
+
+            
+        }
+
+    }
+
+    private IEnumerator DisableTrailAfterDelay(TrailRenderer trail, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (trail != null)
+        {
+            trail.enabled = false;
+            Debug.Log("트레일 렌더러 비활성화");
         }
     }
+
+    private void ConfigureTrailRenderer(TrailRenderer trail, float qualityFactor)
+    {
+        // 기존 속성 초기화
+        trail.Clear(); // 이전 트레일 초기화
+        trail.time = 1.0f;  // 트레일 지속 시간 (초)
+        trail.minVertexDistance = 0.1f;  // 꼭지점 사이의 최소 거리
+        trail.widthMultiplier = 0.1f;  // 트레일 너비
+
+        // 머티리얼 생성 및 설정 (만약 없거나 기본 머티리얼이면)
+        if (trail.material == null || trail.material.name == "Default-Material")
+        {
+            // 파티클 머티리얼 생성 (투명도 지원)
+            Material trailMat = new Material(Shader.Find("Particles/Standard Unlit"));
+            if (trailMat == null)
+            {
+                // 대체 셰이더 시도
+                trailMat = new Material(Shader.Find("Mobile/Particles/Additive"));
+            }
+
+            if (trailMat != null)
+            {
+                trail.material = trailMat;
+                Debug.Log("트레일 렌더러에 새 머티리얼 적용됨");
+            }
+        }
+
+        // 품질에 따른 색상 설정 - 뚜렷한 색상 차이로 변경
+        if (qualityFactor > 0.9f)
+        {
+            // 완벽한 타격 - 금색/빨간색 (매우 밝고 선명하게)
+            Debug.Log("최고 품질 타격 감지: 금색/빨간색 트레일 설정");
+            trail.startColor = new Color(1.0f, 0.9f, 0.0f, 1.0f);  // 밝은 금색
+            trail.endColor = new Color(1.0f, 0.0f, 0.0f, 0.0f);  // 빨간색에서 투명하게
+            trail.time = 1.5f;  // 더 긴 지속 시간
+            trail.widthMultiplier = 0.15f;  // 더 넓은 트레일
+        }
+        else if (qualityFactor > 0.7f)
+        {
+            // 좋은 타격 - 파란색/하늘색 
+            Debug.Log("중간 품질 타격 감지: 파란색/하늘색 트레일 설정");
+            trail.startColor = new Color(0.0f, 0.0f, 1.0f, 1.0f);  // 선명한 파란색
+            trail.endColor = new Color(0.0f, 0.7f, 1.0f, 0.0f);  // 하늘색에서 투명하게
+            trail.time = 1.0f;
+            trail.widthMultiplier = 0.12f;
+        }
+        else
+        {
+            // 중심에서 벗어난 타격 - 초록색/회색
+            Debug.Log("낮은 품질 타격 감지: 초록색/회색 트레일 설정");
+            trail.startColor = new Color(0.0f, 0.8f, 0.2f, 1.0f);  // 선명한 초록색
+            trail.endColor = new Color(0.5f, 0.5f, 0.5f, 0.0f);  // 회색에서 투명하게
+            trail.time = 0.8f;  // 짧은 지속 시간
+            trail.widthMultiplier = 0.08f;  // 더 좁은 트레일
+        }
+
+        // 트레일 너비 변화 - 시작은 더 넓고 끝으로 갈수록 좁아짐
+        AnimationCurve widthCurve = new AnimationCurve();
+        widthCurve.AddKey(0.0f, 1.0f);  // 시작 지점: 원래 너비의 100%
+        widthCurve.AddKey(1.0f, 0.0f);  // 끝 지점: 원래 너비의 0%
+        trail.widthCurve = widthCurve;
+
+        // 알파값 설정 확인
+        trail.colorGradient = CreateGradient(trail.startColor, trail.endColor);
+
+        Debug.Log($"트레일 색상 설정 완료 - 시작색: {trail.startColor}, 끝색: {trail.endColor}, 품질: {qualityFactor}");
+    }
+
+    private Gradient CreateGradient(Color startColor, Color endColor)
+    {
+        Gradient gradient = new Gradient();
+
+        // 그라데이션 키 설정
+        GradientColorKey[] colorKeys = new GradientColorKey[2];
+        colorKeys[0].color = new Color(startColor.r, startColor.g, startColor.b); // 알파 제외한 색상
+        colorKeys[0].time = 0.0f;
+        colorKeys[1].color = new Color(endColor.r, endColor.g, endColor.b); // 알파 제외한 색상
+        colorKeys[1].time = 1.0f;
+
+        // 알파 키 설정 (투명도 변화)
+        GradientAlphaKey[] alphaKeys = new GradientAlphaKey[2];
+        alphaKeys[0].alpha = startColor.a; // 시작 알파값
+        alphaKeys[0].time = 0.0f;
+        alphaKeys[1].alpha = endColor.a; // 끝 알파값
+        alphaKeys[1].time = 1.0f;
+
+        gradient.SetKeys(colorKeys, alphaKeys);
+        return gradient;
+    }
+
 
     /// <summary>
     /// 타격 사운드를 재생합니다. 품질 계수에 따라 사운드 특성이 조정됩니다.

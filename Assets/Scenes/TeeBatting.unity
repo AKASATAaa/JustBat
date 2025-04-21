@@ -1679,7 +1679,7 @@ MonoBehaviour:
   displayDuration: 5
   showDirection: 1
   directionArrowScale: 1
-  directionIndicator: {fileID: 3876079539434028420, guid: 652aef552212bed469a9ec75a3dda6ca, type: 3}
+  directionIndicator: {fileID: 0}
 --- !u!4 &313818102
 Transform:
   m_ObjectHideFlags: 0
@@ -3545,8 +3545,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   teeBallPrefab: {fileID: 3220906015835315101, guid: 41831f0f7b29d574cab3058bf0b6be99, type: 3}
   spawnPoint: {fileID: 581633366}
-  checkInterval: 1
-  spawnOnStart: 1
+  respawnTimeAfterHit: 5
+  maxTeeBalls: 2
+  debugSphere: {fileID: 0}
+  activeColor: {r: 0, g: 1, b: 0, a: 1}
+  scheduledColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  errorColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &588864250
 GameObject:
   m_ObjectHideFlags: 0
@@ -7211,54 +7215,6 @@ MonoBehaviour:
   sliderSettings: []
   curveSettings: []
   changeupSettings: []
---- !u!1 &1249270646
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1249270648}
-  - component: {fileID: 1249270647}
-  m_Layer: 0
-  m_Name: TeeBallSpawner
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1249270647
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1249270646}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 233178aa4e0e4ad4a9a21d416265dbf5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  teeBallPrefab: {fileID: 0}
-  spawnPoint: {fileID: 581633366}
-  checkInterval: 1
-  spawnOnStart: 1
---- !u!4 &1249270648
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1249270646}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.718, y: 0.424, z: 0.748}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1274114232
 GameObject:
   m_ObjectHideFlags: 0
@@ -12352,7 +12308,7 @@ Transform:
   m_GameObject: {fileID: 1968763601064033}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0.7043425, w: 0.7098603}
-  m_LocalPosition: {x: 4.207, y: 0.766, z: 0.24000001}
+  m_LocalPosition: {x: 3.996, y: 0.764, z: 0.24000001}
   m_LocalScale: {x: 1.1033986, y: 1.1033986, z: 1.1033993}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -12430,9 +12386,9 @@ MonoBehaviour:
     m_Bits: 0
   sweepRadius: 0.1
   sweepResolution: 10
-  sweetSpotRadius: 0.32
-  sweetSpotMaxDistance: 0.39
-  sweetSpotFalloffRate: 10
+  sweetSpotRadius: 0.29
+  sweetSpotMaxDistance: 0.45
+  sweetSpotFalloffRate: 10.54
   minQualityFactor: 0.4
   sweetSpotColor: {r: 1, g: 0, b: 0, a: 1}
   effectRangeColor: {r: 1, g: 0.5, b: 0, a: 0.3}
@@ -12797,7 +12753,7 @@ GameObject:
   - component: {fileID: 7323456180815938077}
   m_Layer: 0
   m_Name: stadium
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12815,7 +12771,7 @@ GameObject:
   - component: {fileID: 5509644710411313527}
   m_Layer: 0
   m_Name: 1_B
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12864,7 +12820,7 @@ GameObject:
   - component: {fileID: 1374103106513797361}
   m_Layer: 0
   m_Name: Box009
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13105,7 +13061,7 @@ GameObject:
   - component: {fileID: 6721992598969582973}
   m_Layer: 0
   m_Name: Box002
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14053,7 +14009,7 @@ GameObject:
   - component: {fileID: 7496115294984211551}
   m_Layer: 0
   m_Name: Better_box_L
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14095,7 +14051,7 @@ GameObject:
   - component: {fileID: 8247994413308365437}
   m_Layer: 0
   m_Name: Floor
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14303,7 +14259,7 @@ GameObject:
   - component: {fileID: 6220063269006136820}
   m_Layer: 0
   m_Name: Box011
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14336,7 +14292,7 @@ GameObject:
   - component: {fileID: 8266765458143543285}
   m_Layer: 0
   m_Name: 2_B
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14461,7 +14417,7 @@ GameObject:
   - component: {fileID: 5937993237129380035}
   m_Layer: 0
   m_Name: screen
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14779,7 +14735,7 @@ GameObject:
   - component: {fileID: 3710684938586372229}
   m_Layer: 0
   m_Name: 3_B
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14881,7 +14837,7 @@ GameObject:
   - component: {fileID: 8389055781647160395}
   m_Layer: 0
   m_Name: Better_box_R
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -26007,7 +25963,7 @@ GameObject:
   - component: {fileID: 8424073626808003369}
   m_Layer: 0
   m_Name: Box001
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -27375,7 +27331,7 @@ GameObject:
   - component: {fileID: 8487167654851563117}
   m_Layer: 0
   m_Name: Cylinder001
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -43138,7 +43094,7 @@ GameObject:
   - component: {fileID: 8638958803679015472}
   m_Layer: 0
   m_Name: Box010
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -43445,7 +43401,6 @@ SceneRoots:
   - {fileID: 1499031912}
   - {fileID: 1015340139}
   - {fileID: 1509949975}
-  - {fileID: 1249270648}
   - {fileID: 581633366}
   - {fileID: 1954947152}
   - {fileID: 605734822}

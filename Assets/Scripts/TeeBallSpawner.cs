@@ -1,69 +1,104 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// TeeBall »ı¼º ¿µ¿ª¿¡ ºÙÀÏ ½ºÅ©¸³Æ®
+// ê°„ë‹¨í•œ TeeBall ìƒì„± ìŠ¤í¬ë¦½íŠ¸
 public class TeeBallSpawner : MonoBehaviour
 {
-    [SerializeField] private GameObject teeBallPrefab; // TeeBall ÇÁ¸®ÆÕ
-    [SerializeField] private Transform spawnPoint; // »ı¼º À§Ä¡ (¾øÀ¸¸é ÀÌ ¿ÀºêÁ§Æ® À§Ä¡ »ç¿ë)
-    [SerializeField] private float checkInterval = 1.0f; // È®ÀÎ ÁÖ±â(ÃÊ)
-    [SerializeField] private bool spawnOnStart = true; // ½ÃÀÛ ½Ã »ı¼º ¿©ºÎ
+    [SerializeField] private GameObject teeBallPrefab; // TeeBall í”„ë¦¬íŒ¹
+    [SerializeField] private Transform spawnPoint; // ìƒì„± ìœ„ì¹˜ (ì—†ìœ¼ë©´ ì´ ì˜¤ë¸Œì íŠ¸ ìœ„ì¹˜ ì‚¬ìš©)
+    [SerializeField] private float respawnDelay = 5.0f; // ì¬ìƒì„± ëŒ€ê¸° ì‹œê°„(ì´ˆ)
+    [SerializeField] private bool spawnOnStart = true; // ì‹œì‘ ì‹œ ìƒì„± ì—¬ë¶€
+
+    private Collider triggerCollider; // íŠ¸ë¦¬ê±° ì½œë¼ì´ë”
+    private bool isRespawnScheduled = false; // ì¬ìƒì„± ì˜ˆì•½ ì—¬ë¶€
 
     private void Start()
     {
-        // TeeBallArea ÅÂ±× È®ÀÎ
+        // íŠ¸ë¦¬ê±° ì½œë¼ì´ë” í™•ì¸
+        triggerCollider = GetComponent<Collider>();
+        if (triggerCollider == null)
+        {
+            Debug.LogError("TeeBallSpawnerì— Colliderê°€ ì—†ìŠµë‹ˆë‹¤!");
+            return;
+        }
+
+        if (!triggerCollider.isTrigger)
+        {
+            Debug.LogWarning("Colliderê°€ íŠ¸ë¦¬ê±°ë¡œ ì„¤ì •ë˜ì–´ ìˆì§€ ì•ŠìŠµë‹ˆë‹¤. íŠ¸ë¦¬ê±°ë¡œ ë³€ê²½í•©ë‹ˆë‹¤.");
+            triggerCollider.isTrigger = true;
+        }
+
+        // TeeBallArea íƒœê·¸ í™•ì¸
         if (!gameObject.CompareTag("TeeBallArea"))
         {
-            Debug.LogWarning("TeeBallSpawner°¡ ºÙÀº ¿ÀºêÁ§Æ®¿¡ 'TeeBallArea' ÅÂ±×°¡ ÇÊ¿äÇÕ´Ï´Ù.");
+            Debug.LogWarning("TeeBallSpawnerê°€ ë¶™ì€ ì˜¤ë¸Œì íŠ¸ì— 'TeeBallArea' íƒœê·¸ê°€ í•„ìš”í•©ë‹ˆë‹¤.");
             gameObject.tag = "TeeBallArea";
         }
 
-        // Collider È®ÀÎ
-        if (GetComponent<Collider>() == null || !GetComponent<Collider>().isTrigger)
-        {
-            Debug.LogError("TeeBallSpawner¿¡´Â Æ®¸®°Å·Î ¼³Á¤µÈ Collider°¡ ÇÊ¿äÇÕ´Ï´Ù!");
-        }
-
+        // ì‹œì‘ ì‹œ ê³µ ìƒì„±
         if (spawnOnStart)
         {
             SpawnTeeBall();
         }
 
-        // ÁÖ±âÀûÀ¸·Î È®ÀÎ
-        StartCoroutine(CheckTeeBallRoutine());
+        // ì •ê¸°ì ìœ¼ë¡œ ê³µ ì¡´ì¬ ì—¬ë¶€ í™•ì¸
+        InvokeRepeating("CheckForTeeBall", 1.0f, 1.0f);
     }
 
-    IEnumerator CheckTeeBallRoutine()
+    // íŠ¸ë¦¬ê±° ì˜ì—­ ë‚´ì— í‹°ë³¼ì´ ìˆëŠ”ì§€ í™•ì¸
+    private void CheckForTeeBall()
     {
-        while (true)
-        {
-            yield return new WaitForSeconds(checkInterval);
+        if (isRespawnScheduled)
+            return;
 
-            // TeeBall ÅÂ±×¸¦ °¡Áø ¿ÀºêÁ§Æ®°¡ ÀÖ´ÂÁö È®ÀÎ
-            if (GameObject.FindGameObjectWithTag("TeeBall") == null)
+        bool foundTeeBall = false;
+
+        // íŠ¸ë¦¬ê±° ì˜ì—­ ë‚´ì— TeeBall íƒœê·¸ë¥¼ ê°€ì§„ ì˜¤ë¸Œì íŠ¸ê°€ ìˆëŠ”ì§€ í™•ì¸
+        Collider[] colliders = Physics.OverlapBox(
+            triggerCollider.bounds.center,
+            triggerCollider.bounds.extents,
+            transform.rotation
+        );
+
+        foreach (Collider col in colliders)
+        {
+            if (col.CompareTag("TeeBall"))
             {
-                SpawnTeeBall();
+                foundTeeBall = true;
+                break;
             }
+        }
+
+        // íŠ¸ë¦¬ê±° ì˜ì—­ ë‚´ì— í‹°ë³¼ì´ ì—†ìœ¼ë©´ 5ì´ˆ í›„ ìƒì„± ì˜ˆì•½
+        if (!foundTeeBall && !isRespawnScheduled)
+        {
+            isRespawnScheduled = true;
+            Invoke("SpawnTeeBall", respawnDelay);
+            Debug.Log($"í‹°ë³¼ì´ ì—†ìŒ: {respawnDelay}ì´ˆ í›„ì— ìƒˆ í‹°ë³¼ ìƒì„± ì˜ˆì •");
         }
     }
 
-    void SpawnTeeBall()
+    // TeeBall ìƒì„±
+    private void SpawnTeeBall()
     {
-        // »ı¼º À§Ä¡ °áÁ¤
+        // ìƒì„± ìœ„ì¹˜ ê²°ì •
         Vector3 position = (spawnPoint != null) ? spawnPoint.position : transform.position;
         Quaternion rotation = (spawnPoint != null) ? spawnPoint.rotation : Quaternion.identity;
 
-        // TeeBall »ı¼º
+        // TeeBall ìƒì„±
         GameObject newTeeBall = Instantiate(teeBallPrefab, position, rotation);
-        newTeeBall.tag = "TeeBall"; // ÅÂ±× ¼³Á¤ (ÇÁ¸®ÆÕ¿¡ ÀÌ¹Ì ¼³Á¤µÇ¾î ÀÖÁö ¾ÊÀº °æ¿ì)
+        newTeeBall.tag = "TeeBall";
 
-        // TeeBallBehavior ½ºÅ©¸³Æ®°¡ ¾øÀ¸¸é Ãß°¡
+        // TeeBallController ìŠ¤í¬ë¦½íŠ¸ê°€ ì—†ìœ¼ë©´ ì¶”ê°€
         if (newTeeBall.GetComponent<TeeBallController>() == null)
         {
             newTeeBall.AddComponent<TeeBallController>();
         }
 
-        Debug.Log("»õ TeeBall »ı¼ºµÊ");
+        // ì¬ìƒì„± ìƒíƒœ ì´ˆê¸°í™”
+        isRespawnScheduled = false;
+
+        Debug.Log("ìƒˆ TeeBall ìƒì„±ë¨");
     }
 }

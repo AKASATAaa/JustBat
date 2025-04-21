@@ -1,70 +1,70 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
 /// <summary>
-/// Å¸±¸ Á¤º¸¸¦ TextMeshPro·Î Ç¥½ÃÇÏ±â À§ÇÑ ÄÄÆ÷³ÍÆ®
+/// íƒ€êµ¬ ì •ë³´ë¥¼ TextMeshProë¡œ í‘œì‹œí•˜ê¸° ìœ„í•œ ì»´í¬ë„ŒíŠ¸
 /// </summary>
 public class HitInfoDisplay : MonoBehaviour
 {
-    [Header("µğ½ºÇÃ·¹ÀÌ ¼³Á¤")]
+    [Header("ë””ìŠ¤í”Œë ˆì´ ì„¤ì •")]
     [SerializeField] private TextMeshPro hitInfoText;
 
-    [Header("Ç¥½Ã ¼³Á¤")]
+    [Header("í‘œì‹œ ì„¤ì •")]
     [SerializeField] private float displayDuration = 5.0f;
     [SerializeField] private bool showDirection = true;
     [SerializeField] private float directionArrowScale = 1.0f;
 
-    [Header("¹æÇâ Ç¥½Ã °ÔÀÓ¿ÀºêÁ§Æ®")]
+    [Header("ë°©í–¥ í‘œì‹œ ê²Œì„ì˜¤ë¸Œì íŠ¸")]
     [SerializeField] private GameObject directionIndicator;
 
-    private HitInfo currentHitInfo; // ÇöÀç Ç¥½Ã ÁßÀÎ Å¸°İ Á¤º¸ ÀúÀå
-    // ¸¶Áö¸· Å¸±¸ Á¤º¸
+    private HitInfo currentHitInfo; // í˜„ì¬ í‘œì‹œ ì¤‘ì¸ íƒ€ê²© ì •ë³´ ì €ì¥
+    // ë§ˆì§€ë§‰ íƒ€êµ¬ ì •ë³´
     private HitInfo lastHitInfo;
     private bool isDisplaying = false;
 
-    // Å¸ÀÌ¸Ó °ü·Ã
+    // íƒ€ì´ë¨¸ ê´€ë ¨
     private Coroutine clearTextCoroutine;
 
     private void Start()
     {
-        // TextMeshPro°¡ ¿¬°áµÇ¾î ÀÖÁö ¾Ê´Ù¸é ÀÚ½Ä¿¡¼­ Ã£±â
+        // TextMeshProê°€ ì—°ê²°ë˜ì–´ ìˆì§€ ì•Šë‹¤ë©´ ìì‹ì—ì„œ ì°¾ê¸°
         if (hitInfoText == null)
         {
             hitInfoText = GetComponentInChildren<TextMeshPro>();
             if (hitInfoText == null)
             {
-                Debug.LogError("HitInfoDisplay¿¡ TextMeshPro°¡ ¿¬°áµÇ¾î ÀÖÁö ¾Ê½À´Ï´Ù.");
+                Debug.LogError("HitInfoDisplayì— TextMeshProê°€ ì—°ê²°ë˜ì–´ ìˆì§€ ì•ŠìŠµë‹ˆë‹¤.");
             }
         }
 
-        // ¹æÇâ Ç¥½Ã±â°¡ ¾ø´Ù¸é »ı¼º
+        // ë°©í–¥ í‘œì‹œê¸°ê°€ ì—†ë‹¤ë©´ ìƒì„±
         if (showDirection && directionIndicator == null)
         {
             directionIndicator = new GameObject("DirectionIndicator");
             directionIndicator.transform.SetParent(transform);
             directionIndicator.transform.localPosition = Vector3.zero;
 
-            // °£´ÜÇÑ È­»ìÇ¥ ¸ğ¾ç »ı¼º
+            // ê°„ë‹¨í•œ í™”ì‚´í‘œ ëª¨ì–‘ ìƒì„±
             GameObject arrow = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             arrow.transform.SetParent(directionIndicator.transform);
             arrow.transform.localScale = new Vector3(0.05f, 0.5f, 0.05f) * directionArrowScale;
             arrow.transform.localPosition = new Vector3(0, 0, 0.25f) * directionArrowScale;
 
-            // Äİ¶óÀÌ´õ Á¦°Å (Ãæµ¹ ¹æÁö)
+            // ì½œë¼ì´ë” ì œê±° (ì¶©ëŒ ë°©ì§€)
             Destroy(arrow.GetComponent<Collider>());
 
-            // ¹æÇâ Ç¥½Ã±â ÃÊ±â ºñÈ°¼ºÈ­
+            // ë°©í–¥ í‘œì‹œê¸° ì´ˆê¸° ë¹„í™œì„±í™”
             directionIndicator.SetActive(false);
         }
 
-        // ÃÊ±â ÅØ½ºÆ® ¼³Á¤
+        // ì´ˆê¸° í…ìŠ¤íŠ¸ ì„¤ì •
         ClearText();
     }
 
     /// <summary>
-    /// Å¸±¸ Á¤º¸¸¦ Ç¥½Ã
+    /// íƒ€êµ¬ ì •ë³´ë¥¼ í‘œì‹œ
     /// </summary>
     public void DisplayHitInfo(HitInfo hitInfo)
     {
@@ -72,39 +72,40 @@ public class HitInfoDisplay : MonoBehaviour
         isDisplaying = true;
         currentHitInfo = hitInfo;
 
-        // ÅØ½ºÆ® ¾÷µ¥ÀÌÆ®
+        // í…ìŠ¤íŠ¸ ì—…ë°ì´íŠ¸
         UpdateInfoText();
 
-        // ¹æÇâ Ç¥½Ã±â ¾÷µ¥ÀÌÆ®
+        // ë°©í–¥ í‘œì‹œê¸° ì—…ë°ì´íŠ¸
         UpdateDirectionIndicator();
 
-        // ÀÌÀü ÄÚ·çÆ¾ÀÌ ÀÖ´Ù¸é ÁßÁö
+        // ì´ì „ ì½”ë£¨í‹´ì´ ìˆë‹¤ë©´ ì¤‘ì§€
         if (clearTextCoroutine != null)
         {
             StopCoroutine(clearTextCoroutine);
         }
 
-        // »õ ÄÚ·çÆ¾ ½ÃÀÛ
+        // ìƒˆ ì½”ë£¨í‹´ ì‹œì‘
         clearTextCoroutine = StartCoroutine(ClearAfterDelay());
     }
 
-    // ÇöÀç Ç¥½Ã ÁßÀÎ Å¸°İ Á¤º¸ ¹İÈ¯
+    // í˜„ì¬ í‘œì‹œ ì¤‘ì¸ íƒ€ê²© ì •ë³´ ë°˜í™˜
     public HitInfo GetCurrentHitInfo()
     {
         return currentHitInfo;
     }
 
-    // ÅØ½ºÆ® ¾÷µ¥ÀÌÆ®
+    // í…ìŠ¤íŠ¸ ì—…ë°ì´íŠ¸
     private void UpdateInfoText()
     {
         if (hitInfoText == null || lastHitInfo == null) return;
 
-        // ºñ°Å¸® ÅØ½ºÆ®¿¡ Ãß°¡ Ç¥½Ã (¿¹»óÄ¡ ¶Ç´Â ½ÇÃøÄ¡ Ç¥½Ã)
+        // ë¹„ê±°ë¦¬ í…ìŠ¤íŠ¸ì— ì¶”ê°€ í‘œì‹œ (ì˜ˆìƒì¹˜ ë˜ëŠ” ì‹¤ì¸¡ì¹˜ í‘œì‹œ)
         string distanceLabel = "dist";
         string distanceValue = "wait"; //= $"{lastHitInfo.EstimatedDistance:F1}";
-        string distanceColor = "#00FF00"; // ±âº» »ö»ó
+        string distanceColor = "#00FF00"; // ê¸°ë³¸ ìƒ‰ìƒ
 
-        // HitInfoDisplay¿¡ ¿¬°áµÈ BallController°¡ ÀÖÀ¸¸é È®ÀÎ
+        // BallController í™•ì¸
+        bool distanceFound = false;
         BallController[] balls = FindObjectsOfType<BallController>();
         foreach (BallController ball in balls)
         {
@@ -112,63 +113,100 @@ public class HitInfoDisplay : MonoBehaviour
             {
                 if (ball.hasLanded)
                 {
-                    // ½ÇÁ¦ ÃøÁ¤µÈ °Å¸®°¡ ÀÖÀ¸¸é Ç¥½Ã Çü½Ä º¯°æ
+                    // ì‹¤ì œ ì¸¡ì •ëœ ê±°ë¦¬ê°€ ìˆìœ¼ë©´ í‘œì‹œ í˜•ì‹ ë³€ê²½
                     distanceLabel = "dist(actual)";
                     if (ball.actualDistance > 120)
                         distanceValue = $"HOMERUN! {ball.actualDistance:F1}";
                     else
                         distanceValue = $"{ball.actualDistance:F1}";
-                    distanceColor = "#FFFF00"; // ½ÇÃøÄ¡´Â ´Ù¸¥ »ö»óÀ¸·Î Ç¥½Ã
+                    distanceColor = "#FFFF00"; // ì‹¤ì¸¡ì¹˜ëŠ” ë‹¤ë¥¸ ìƒ‰ìƒìœ¼ë¡œ í‘œì‹œ
+                    distanceFound = true;
                     break;
                 }
                 else if (ball.isCalculatingDistance)
                 {
-                    // °è»ê ÁßÀÎ °æ¿ì Ç¥½Ã
+                    // ê³„ì‚° ì¤‘ì¸ ê²½ìš° í‘œì‹œ
                     distanceLabel = "dist(calc)";
+                    distanceFound = true;
                     break;
                 }
             }
         }
 
+        // TeeBallController í™•ì¸ (ì¶”ê°€ëœ ë¶€ë¶„)
+        if (!distanceFound)
+        {
+            TeeBallController[] teeBalls = FindObjectsOfType<TeeBallController>();
+            foreach (TeeBallController teeBall in teeBalls)
+            {
+                if (teeBall.hasCollided)
+                {
+                    if (teeBall.hasLanded)
+                    {
+                        // ì‹¤ì œ ì¸¡ì •ëœ ê±°ë¦¬ê°€ ìˆìœ¼ë©´ í‘œì‹œ í˜•ì‹ ë³€ê²½
+                        distanceLabel = "dist(actual)";
+                        if (teeBall.actualDistance > 120)
+                            distanceValue = $"HOMERUN! {teeBall.actualDistance:F1}";
+                        else
+                            distanceValue = $"{teeBall.actualDistance:F1}";
+                        distanceColor = "#FFFF00"; // ì‹¤ì¸¡ì¹˜ëŠ” ë‹¤ë¥¸ ìƒ‰ìƒìœ¼ë¡œ í‘œì‹œ
+                        break;
+                    }
+                    else if (teeBall.isCalculatingDistance)
+                    {
+                        // ê³„ì‚° ì¤‘ì¸ ê²½ìš° í‘œì‹œ
+                        distanceLabel = "dist(calc)";
+                        break;
+                    }
+                }
+            }
+        }
+
+        // ê¸°ë³¸ ì •ë³´ (HitInfoì˜ EstimatedDistance)ê°€ ìˆìœ¼ë©´ í‘œì‹œ
+        if (distanceValue == "wait" && lastHitInfo.EstimatedDistance > 0)
+        {
+            distanceValue = $"{lastHitInfo.EstimatedDistance:F1}";
+        }
+
         hitInfoText.text = $"<b>Hitinfo</b>\n" +
                           $"speed: <color=#FF6B00>{lastHitInfo.ExitVelocity / 3:F1}</color> km/h\n" +
-                          $"angle: <color=#00A0FF>{lastHitInfo.LaunchAngle:F1}</color>¡Æ\n" +
+                          $"angle: <color=#00A0FF>{lastHitInfo.LaunchAngle:F1}</color>Â°\n" +
                           $"{distanceLabel}: <color={distanceColor}>{distanceValue}</color> m";
 
-        // ÅØ½ºÆ® È°¼ºÈ­ È®ÀÎ
+        // í…ìŠ¤íŠ¸ í™œì„±í™” í™•ì¸
         if (!hitInfoText.gameObject.activeSelf)
         {
             hitInfoText.gameObject.SetActive(true);
         }
     }
 
-    // ¹æÇâ Ç¥½Ã±â ¾÷µ¥ÀÌÆ®
+    // ë°©í–¥ í‘œì‹œê¸° ì—…ë°ì´íŠ¸
     private void UpdateDirectionIndicator()
     {
         if (!showDirection || directionIndicator == null || lastHitInfo == null) return;
 
-        // XZ Æò¸é¿¡¼­ÀÇ ¹æÇâ °è»ê (YÃàÀº ¹«½Ã)
+        // XZ í‰ë©´ì—ì„œì˜ ë°©í–¥ ê³„ì‚° (Yì¶•ì€ ë¬´ì‹œ)
         Vector3 horizontalDirection = new Vector3(
             lastHitInfo.Direction.x,
             0,
             lastHitInfo.Direction.z
         ).normalized;
 
-        // ¹æÇâ Ç¥½Ã±â È¸Àü
+        // ë°©í–¥ í‘œì‹œê¸° íšŒì „
         directionIndicator.transform.rotation = Quaternion.LookRotation(horizontalDirection);
 
-        // Ç¥½Ã±â È°¼ºÈ­
+        // í‘œì‹œê¸° í™œì„±í™”
         directionIndicator.SetActive(true);
     }
 
-    // ÀÏÁ¤ ½Ã°£ ÈÄ Ç¥½Ã Áö¿ì±â
+    // ì¼ì • ì‹œê°„ í›„ í‘œì‹œ ì§€ìš°ê¸°
     private IEnumerator ClearAfterDelay()
     {
         yield return new WaitForSeconds(displayDuration);
         ClearText();
     }
 
-    // ÅØ½ºÆ® ¹× ¹æÇâ Ç¥½Ã Áö¿ì±â
+    // í…ìŠ¤íŠ¸ ë° ë°©í–¥ í‘œì‹œ ì§€ìš°ê¸°
     private void ClearText()
     {
         isDisplaying = false;
@@ -184,16 +222,16 @@ public class HitInfoDisplay : MonoBehaviour
         }
     }
 
-    // ¿¡µğÅÍ¿¡¼­ ½Ã°¢È­
+    // ì—ë””í„°ì—ì„œ ì‹œê°í™”
     private void OnDrawGizmos()
     {
         if (Application.isPlaying && isDisplaying && lastHitInfo != null)
         {
-            // Å¸±¸ ¹æÇâ ±×¸®±â
+            // íƒ€êµ¬ ë°©í–¥ ê·¸ë¦¬ê¸°
             Gizmos.color = Color.red;
             Gizmos.DrawRay(transform.position, lastHitInfo.Direction * 2f);
 
-            // Å¸±¸ °Å¸® Ç¥½Ã (¼öÆò Åõ¿µ)
+            // íƒ€êµ¬ ê±°ë¦¬ í‘œì‹œ (ìˆ˜í‰ íˆ¬ì˜)
             Gizmos.color = Color.green;
             Vector3 horizontalDir = new Vector3(lastHitInfo.Direction.x, 0, lastHitInfo.Direction.z).normalized;
             Gizmos.DrawLine(transform.position,

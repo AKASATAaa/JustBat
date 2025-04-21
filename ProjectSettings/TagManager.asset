@@ -9,6 +9,7 @@ TagManager:
   - Ball_Indicator
   - TeeBall
   - TeeBallArea
+  - Ground
   layers:
   - Default
   - TransparentFX
