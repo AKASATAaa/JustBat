@@ -46,10 +46,10 @@ public class FadeInOut : MonoBehaviour
             panel.GetComponent<CanvasRenderer>().SetAlpha(Mathf.Lerp(1f, 0f, elapsedTime / fadedTime));
 
             elapsedTime += Time.deltaTime;
-            Debug.Log("Fade In 중...");
+            //Debug.Log("Fade In 중...");
             yield return null;
         }
-        Debug.Log("Fade In 끝");
+        //Debug.Log("Fade In 끝");
         panel.SetActive(false); // Panel을 비활성화
         onCompleteCallback?.Invoke(); // 이후에 해야 하는 다른 액션이 있는 경우(null이 아님) 진행한다
         yield break;
@@ -65,11 +65,11 @@ public class FadeInOut : MonoBehaviour
             panel.GetComponent<CanvasRenderer>().SetAlpha(Mathf.Lerp(0f, 1f, elapsedTime / fadedTime));
 
             elapsedTime += Time.deltaTime;
-            Debug.Log("Fade Out 중...");
+            //Debug.Log("Fade Out 중...");
             yield return null;
         }
 
-        Debug.Log("Fade Out 끝");
+        //Debug.Log("Fade Out 끝");
         onCompleteCallback?.Invoke(); // 이후에 해야 하는 다른 액션이 있는 경우(null이 아님) 진행한다
         yield break;
     }
