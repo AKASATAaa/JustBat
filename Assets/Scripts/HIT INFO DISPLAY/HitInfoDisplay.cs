@@ -169,7 +169,7 @@ public class HitInfoDisplay : MonoBehaviour
         }
 
         hitInfoText.text = $"<b>Hitinfo</b>\n" +
-                          $"speed: <color=#FF6B00>{lastHitInfo.ExitVelocity / 3:F1}</color> km/h\n" +
+                          $"speed: <color=#FF6B00>{lastHitInfo.ExitVelocity:F1}</color> km/h\n" +
                           $"angle: <color=#00A0FF>{lastHitInfo.LaunchAngle:F1}</color>°\n" +
                           $"{distanceLabel}: <color={distanceColor}>{distanceValue}</color> m";
 

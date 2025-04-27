@@ -186,6 +186,7 @@ public class BallController : MonoBehaviour
         }
     }
 
+
     /**
      * 오디오 볼륨을 업데이트하는 메서드
      * 파워에 따라 볼륨을 조절합니다.
@@ -274,6 +275,8 @@ public class BallController : MonoBehaviour
                 "공 발사: 방향={0}, 힘={1:F2}, 수직각={2}도, 수평각={3}도",
                 adjustedDirection, normalizedForce, verticalAngleOffset, horizontalAngleOffset));
         }
+
+        whooshClip.Play();
     }
 
     /**
@@ -651,6 +654,8 @@ public class BallController : MonoBehaviour
             Gizmos.DrawSphere(position + velocityDirection * velocityLength, 0.03f);
         }
     }
+
+
 }
 
 /**

@@ -114,7 +114,7 @@ MonoBehaviour:
   horizontalRotationMultiplier: 1
   hasCollided: 0
   whooshClip: {fileID: 0}
-  minVolume: 0.1
+  minVolume: 1
   maxVolume: 20
   volumeCurve: 3
   minThrowPower: 70
@@ -190,7 +190,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 1dc4bd38a753a5b49960e576acf8c02b, type: 3}
-  m_PlayOnAwake: 0
+  m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 2
   Loop: 0
@@ -200,7 +200,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 0.13
-  MaxDistance: 5.92
+  MaxDistance: 10.19
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -265,7 +265,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1.01
+      value: 1.028
       inSlope: 0
       outSlope: 0
       tangentMode: 0

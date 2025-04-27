@@ -25,20 +25,19 @@ public class BallSpawner : MonoBehaviour
     [Tooltip("공 발사 위치")]
     public Transform releasePoint;
 
-    //
-
     [Header("애니메이션 설정")]
     [Tooltip("투수 애니메이터 컴포넌트")]
     public Animator pitcherAnimator;
 
-    [Tooltip("투구 사이 대기 시간 (초)")]
-    public float pitchDelay = 2.0f;
-
     [Tooltip("애니메이션 트리거 파라미터 이름")]
-    public string[] pitchAnimTriggers = { "ThrowFastball", "ThrowSlider", "ThrowCurve", "ThrowChangeup" };
-
-    [Tooltip("준비 자세 애니메이션 트리거")]
+    public string idleAnimTrigger = "Idle";
     public string readyAnimTrigger = "Ready";
+
+    [Tooltip("투구 스타일 애니메이션 트리거")]
+    public string overhandAnimTrigger = "PitchOverhand";
+    public string sidearmAnimTrigger = "PitchSidearm";
+    public string threeQuarterAnimTrigger = "PitchThreeQuarter";
+    public string underhandAnimTrigger = "PitchUnderhand";
 
     [Header("버튼 오브젝트")]
     [Tooltip("구종 선택 버튼들")]
@@ -47,6 +46,12 @@ public class BallSpawner : MonoBehaviour
     public Button curveButton;
     public Button changeupButton;
     public Button knuckleballButton;
+
+    [Tooltip("투구 스타일 버튼들")]
+    public Button overhandButton;
+    public Button sidearmButton;
+    public Button threeQuarterButton;
+    public Button underhandButton;
 
     [Tooltip("속도 조절 및 모드 버튼들")]
     public Button increaseSpeedButton;
@@ -115,6 +120,17 @@ public class BallSpawner : MonoBehaviour
     // 현재 투구 정보
     public string pitchTypeName;
 
+    // 투구 스타일 정보
+    private enum PitchStyle
+    {
+        Overhand,
+        Sidearm,
+        ThreeQuarter,
+        Underhand
+    }
+
+    private PitchStyle currentPitchStyle = PitchStyle.Overhand;
+
     // 구종 및 속도 설정 관련 변수
     private PitchSettingsManager pitchSettingsManager;
     private List<BallSettings> currentPitchSettings;
@@ -128,10 +144,23 @@ public class BallSpawner : MonoBehaviour
     private Vector3 pitchRangeSize; // PitchRange 오브젝트의 크기
 
     // 애니메이션 이벤트에서 사용할 변수
-    private bool isAnimationInProgress = false;
+    private bool isIdleAnimationInProgress = false;
+    private bool isReadyAnimationInProgress = false;
+    private bool isPitchAnimationInProgress = false;
     private bool waitingToSpawn = false;
     private BallSettings pendingBallSettings;
     private string pendingPitchType = "";
+
+    // 애니메이션 상태 관리
+    private enum AnimationState
+    {
+        Idle,
+        Ready,
+        Pitching,
+        None
+    }
+
+    private AnimationState currentAnimState = AnimationState.None;
 
     // 투구 범위 데이터 구조체
     private struct PitchRangeData
@@ -399,6 +428,12 @@ public class BallSpawner : MonoBehaviour
         if (knuckleballButton != null)
             knuckleballButton.gameObject.SetActive(false);
 
+        // 투구 스타일 버튼
+        AttachUIButton(overhandButton, () => SelectPitchStyle(PitchStyle.Overhand));
+        AttachUIButton(sidearmButton, () => SelectPitchStyle(PitchStyle.Sidearm));
+        AttachUIButton(threeQuarterButton, () => SelectPitchStyle(PitchStyle.ThreeQuarter));
+        AttachUIButton(underhandButton, () => SelectPitchStyle(PitchStyle.Underhand));
+
         // 속도 조절 및 모드 버튼
         AttachUIButton(increaseSpeedButton, IncreaseSpeed);
         AttachUIButton(decreaseSpeedButton, DecreaseSpeed);
@@ -416,6 +451,21 @@ public class BallSpawner : MonoBehaviour
         // 기존 리스너 제거 후 새로 추가
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(onClickAction);
+    }
+
+    /**
+     * 투구 스타일을 선택하는 메서드
+     */
+    private void SelectPitchStyle(PitchStyle style)
+    {
+        currentPitchStyle = style;
+
+        if (debugMode)
+        {
+            Debug.Log($"투구 스타일 변경: {currentPitchStyle}");
+        }
+
+        UpdatePitchInfoDisplay();
     }
 
     /**
@@ -505,40 +555,109 @@ public class BallSpawner : MonoBehaviour
 
     /**
      * 애니메이션 기반의 투구 시퀀스를 제어하는 코루틴
-     * 주기적으로 투구 애니메이션을 시작하고 애니메이션 이벤트를 통해 공을 발사합니다.
+     * 애니메이션 상태에 따라 적절한 애니메이션을 시작합니다.
      */
     private IEnumerator AnimatedPitchingSequence()
     {
         yield return new WaitForSeconds(1.0f); // 초기 대기 시간
 
+        // 처음에는 Idle 애니메이션으로 시작
+        StartIdleAnimation();
+
         while (true)
         {
-            // 다음 투구를 위한 대기
-            waitingToSpawn = true;
-            yield return new WaitForSeconds(pitchDelay);
-            waitingToSpawn = false;
-
-            // 투구 애니메이션 시작
-            TriggerPitchAnimation();
-
-            // 애니메이션이 완료될 때까지 대기
-            while (isAnimationInProgress)
+            // 현재 애니메이션 상태에 따라 다음 상태로 전환
+            switch (currentAnimState)
             {
-                yield return null;
+                case AnimationState.Idle:
+                    if (!isIdleAnimationInProgress)
+                    {
+                        // Idle 애니메이션이 끝났으면 Ready 애니메이션 시작
+                        StartReadyAnimation();
+                    }
+                    break;
+
+                case AnimationState.Ready:
+                    if (!isReadyAnimationInProgress)
+                    {
+                        // Ready 애니메이션이 끝났으면 Pitch 애니메이션 시작
+                        StartPitchAnimation();
+                    }
+                    break;
+
+                case AnimationState.Pitching:
+                    if (!isPitchAnimationInProgress)
+                    {
+                        // Pitch 애니메이션이 끝났으면 다시 Idle 애니메이션 시작
+                        StartIdleAnimation();
+                    }
+                    break;
+
+                case AnimationState.None:
+                    // 초기 상태인 경우 Idle 애니메이션 시작
+                    StartIdleAnimation();
+                    break;
             }
+
+            yield return null;
         }
     }
 
     /**
-     * 현재 선택된 구종에 따라 적절한 투구 애니메이션을 시작하는 메서드
+     * Idle 애니메이션을 시작하는 메서드
      */
-    private void TriggerPitchAnimation()
+    private void StartIdleAnimation()
     {
-        if (pitcherAnimator == null || isAnimationInProgress)
+        if (pitcherAnimator == null || isIdleAnimationInProgress)
             return;
 
-        isAnimationInProgress = true;
+        // 다른 트리거 리셋
+        pitcherAnimator.ResetTrigger(readyAnimTrigger);
+        pitcherAnimator.ResetTrigger(overhandAnimTrigger);
+        pitcherAnimator.ResetTrigger(sidearmAnimTrigger);
+        pitcherAnimator.ResetTrigger(threeQuarterAnimTrigger);
+        pitcherAnimator.ResetTrigger(underhandAnimTrigger);
 
+        isIdleAnimationInProgress = true;
+        currentAnimState = AnimationState.Idle;
+
+        // Idle 애니메이션 트리거 설정
+        pitcherAnimator.SetTrigger(idleAnimTrigger);
+
+        if (debugMode && logAnimationEvents)
+        {
+            Debug.Log("Idle 애니메이션 시작");
+        }
+    }
+
+    /**
+     * Ready 애니메이션을 시작하는 메서드
+     */
+    private void StartReadyAnimation()
+    {
+        if (pitcherAnimator == null || isReadyAnimationInProgress)
+            return;
+
+        isReadyAnimationInProgress = true;
+        currentAnimState = AnimationState.Ready;
+
+        // 투구 설정 준비
+        PrepareNextPitch();
+
+        // Ready 애니메이션 트리거 설정
+        pitcherAnimator.SetTrigger(readyAnimTrigger);
+
+        if (debugMode && logAnimationEvents)
+        {
+            Debug.Log("Ready 애니메이션 시작");
+        }
+    }
+
+    /**
+     * 다음 투구를 위한 설정 준비
+     */
+    private void PrepareNextPitch()
+    {
         // 투구 설정 및 타입 결정
         pendingBallSettings = isRandomMode ? GetRandomBallSettings() :
                              currentPitchSettings[speedIndex % currentPitchSettings.Count];
@@ -553,348 +672,513 @@ public class BallSpawner : MonoBehaviour
         {
             ResetTargetP();
         }
+    }
 
-        // 준비 자세 애니메이션 실행
-        pitcherAnimator.SetTrigger(readyAnimTrigger);
+    /**
+     * Pitch 애니메이션을 시작하는 메서드
+     */
+    private void StartPitchAnimation()
+    {
+        if (pitcherAnimator == null || isPitchAnimationInProgress)
+            return;
 
-        // 구종에 맞는 투구 애니메이션 실행
-        int animIndex = GetAnimationIndexForPitchType(pendingPitchType);
+        isPitchAnimationInProgress = true;
+        currentAnimState = AnimationState.Pitching;
 
-        // 애니메이션 트리거 실행
-        if (animIndex < pitchAnimTriggers.Length)
+        // 현재 선택된 투구 스타일에 맞는 애니메이션 트리거 실행
+        string pitchTrigger = GetPitchStyleTrigger();
+        pitcherAnimator.SetTrigger(pitchTrigger);
+
+        if (debugMode && logAnimationEvents)
         {
-            pitcherAnimator.SetTrigger(pitchAnimTriggers[animIndex]);
-
-            if (debugMode && logAnimationEvents)
-            {
-                Debug.Log($"{pendingPitchType} 투구 애니메이션 시작 (트리거: {pitchAnimTriggers[animIndex]})");
-            }
-        }
-        else
-        {
-            if (debugMode)
-            {
-                Debug.LogError($"애니메이션 트리거가 설정되지 않았습니다. (구종: {pendingPitchType})");
-            }
-            isAnimationInProgress = false;
+            Debug.Log($"{currentPitchStyle} 투구 애니메이션 시작 (구종: {pendingPitchType}, 트리거: {pitchTrigger})");
         }
     }
 
     /**
-     * 구종에 따른 애니메이션 인덱스 반환
+     * 현재 선택된 투구 스타일에 대한 애니메이션 트리거 반환
      */
-    private int GetAnimationIndexForPitchType(string pitchType)
+    private string GetPitchStyleTrigger()
     {
-        switch (pitchType)
+        switch (currentPitchStyle)
         {
-            case "Fastball": return 0;
-            case "Slider": return 1;
-            case "Curve": return 2;
-            case "Changeup": return 3;
-            default: return 0; // 기본값은 패스트볼
+            case PitchStyle.Overhand:
+                return overhandAnimTrigger;
+            case PitchStyle.Sidearm:
+                return sidearmAnimTrigger;
+            case PitchStyle.ThreeQuarter:
+                return threeQuarterAnimTrigger;
+            case PitchStyle.Underhand:
+                return underhandAnimTrigger;
+            default:
+                return overhandAnimTrigger; // 기본값
         }
     }
+
+    /**
+     * 애니메이션 이벤트에서 호출되는 Idle 애니메이션 완료 메서드
+     */
+    public void OnIdleAnimationComplete()
+    {
+        // 트리거 리셋
+        pitcherAnimator.ResetTrigger(idleAnimTrigger);
+
+        // 상태 업데이트
+        isIdleAnimationInProgress = false;
+
+        if (debugMode && logAnimationEvents)
+        {
+            Debug.Log("Idle 애니메이션 완료");
+        }
+    }
+
+    /**
+     * Ready 애니메이션 완료 후 트리거 리셋 메서드
+     */
+    public void OnReadyAnimationComplete()
+    {
+        // 트리거 리셋
+        pitcherAnimator.ResetTrigger(readyAnimTrigger);
+
+        // 상태 업데이트
+        isReadyAnimationInProgress = false;
+
+        if (debugMode && logAnimationEvents)
+        {
+            Debug.Log("Ready 애니메이션 완료");
+        }
+    }
+
+    /**
+     * Pitch 애니메이션 완료 후 트리거 리셋 메서드
+     */
+    public void OnPitchAnimationComplete()
+    {
+        // 모든 피치 스타일 트리거 리셋
+        pitcherAnimator.ResetTrigger(overhandAnimTrigger);
+        pitcherAnimator.ResetTrigger(sidearmAnimTrigger);
+        pitcherAnimator.ResetTrigger(threeQuarterAnimTrigger);
+        pitcherAnimator.ResetTrigger(underhandAnimTrigger);
+
+        // 상태 업데이트
+        isPitchAnimationInProgress = false;
+
+        if (debugMode && logAnimationEvents)
+        {
+            Debug.Log("Pitch 애니메이션 완료");
+        }
+    }
+
 
     /**
      * 애니메이션 이벤트에서 호출되는 공 발사 메서드
      * 애니메이션의 특정 프레임에서 이 메서드를 호출하여 공을 생성하고 발사합니다.
      */
     public void OnAnimationReleaseBall()
-    {
-        // 공 생성
-        GameObject ball = Instantiate(ballPrefab, releasePoint.position, releasePoint.rotation);
-
-        // 공에 설정 적용
-        ApplyBallSettings(ball);
-
-        // 일정 시간 후 공 제거
-        StartCoroutine(DestroyBallAfterTime(ball, destroyTime));
-
-        if (debugMode && logBallInfo)
-        {
-            Debug.Log($"{pendingPitchType} 공이 생성되고 발사되었습니다. 속도: {pendingBallSettings.throwPower * 0.36f:F1}km/h");
-        }
-    }
-
-    /**
-     * 생성된 공에 설정 적용
-     */
-    private void ApplyBallSettings(GameObject ball)
-    {
-        // BallController 컴포넌트 확인
-        BallController ballController = ball.GetComponent<BallController>();
-        if (ballController != null)
-        {
-            // 설정 적용
-            ballController.SetBallSettings(pendingBallSettings);
-            ballController.SetPitchType(pendingPitchType);
-
-            // 발사 방향 계산 및 발사
-            ballController.CalculateDirection(releasePoint.position, isRandomMode ? randomTargetP : initialTargetP);
-            ballController.LaunchBall();
-            StartCoroutine(CheckBallHit(ballController));
-        }
-        else if (debugMode)
-        {
-            Debug.LogError("볼 프리팹에 BallController 컴포넌트가 없습니다!");
-        }
-    }
-
-    /**
-     * 애니메이션 이벤트에서 호출되는 애니메이션 완료 메서드
-     * 애니메이션의 마지막 프레임에서 이 메서드를 호출하여 다음 투구를 준비합니다.
-     */
-    public void OnAnimationComplete()
-    {
-        isAnimationInProgress = false;
-
-        if (debugMode && logAnimationEvents)
-        {
-            Debug.Log("투구 애니메이션 완료");
-        }
-    }
-
-    /**
-     * 목표 위치를 PitchRange 오브젝트의 중심으로 재설정하는 메서드
-     */
-    private void ResetTargetP()
-    {
-        // PitchRange 오브젝트의 위치가 변경되었을 수 있으므로 현재 위치 확인
-        if (pitchRangeObject != null)
-        {
-            initialTargetP = pitchRangeObject.transform.position;
-        }
-
-        randomTargetP = initialTargetP;
-
-        if (debugMode && logRandomGeneration)
-        {
-            Debug.Log($"타겟 위치 재설정: {initialTargetP}");
-        }
-    }
-
-    /**
-     * 랜덤 모드에서 무작위 공 설정을 생성하는 메서드
-     * 각 구종마다 다른 확률로 선택되며, 속도도 조정됩니다.
-     */
-    private BallSettings GetRandomBallSettings()
-    {
-        float randomValue = Random.value * 100;
-        int randomSpeed = speedValues[speedIndex];
-        List<BallSettings> possibleSettings = new List<BallSettings>();
-
-        // 확률에 따라 다른 구종 선택
-        if (randomValue < 40) // Fastball 40%
-        {
-            possibleSettings = FindSettingsForSpeedAndType(randomSpeed, pitchSettingsManager.fastballSettings, "Fastball");
-        }
-        else if (randomValue < 60) // Changeup 20%
-        {
-            randomSpeed -= 10; // 체인지업은 속도 감소
-            possibleSettings = FindSettingsForSpeedAndType(randomSpeed, pitchSettingsManager.changeupSettings, "Changeup");
-        }
-        else if (randomValue < 80) // Slider 20%
-        {
-            randomSpeed -= 10; // 슬라이더는 속도 감소
-            possibleSettings = FindSettingsForSpeedAndType(randomSpeed, pitchSettingsManager.sliderSettings, "Slider");
-        }
-        else // Curve 20%
-        {
-            randomSpeed -= 20; // 커브는 속도 크게 감소
-            possibleSettings = FindSettingsForSpeedAndType(randomSpeed, pitchSettingsManager.curveSettings, "Curve");
-        }
-
-        // 가능한 설정들 중에서 랜덤 선택
-        if (possibleSettings.Count == 0)
-        {
-            if (debugMode && logRandomGeneration)
             {
-                Debug.LogWarning("랜덤 모드에서 적합한 설정을 찾지 못했습니다. 기본값 사용");
-            }
-            return pitchSettingsManager.fastballSettings[0]; // 기본값 사용
-        }
+                // 공 생성
+                GameObject ball = Instantiate(ballPrefab, releasePoint.position, releasePoint.rotation);
 
-        BallSettings selectedSettings = possibleSettings[Random.Range(0, possibleSettings.Count)];
+                // 공에 설정 적용
+                ApplyBallSettings(ball);
 
-        if (debugMode && logRandomGeneration)
-        {
-            Debug.Log($"랜덤 설정 선택: {GetPitchTypeName(selectedSettings)}, 속도: {selectedSettings.throwPower * 0.36f:F1}km/h");
-        }
+                // 일정 시간 후 공 제거
+                StartCoroutine(DestroyBallAfterTime(ball, destroyTime));
 
-        return selectedSettings;
-    }
-
-    /**
-     * 특정 속도와 구종에 대한 설정 찾기
-     */
-    private List<BallSettings> FindSettingsForSpeedAndType(int targetSpeed, List<BallSettings> typeSettings, string typeName)
-    {
-        List<BallSettings> result = new List<BallSettings>();
-
-        foreach (var settings in typeSettings)
-        {
-            if (settings.name == targetSpeed)
-            {
-                result.Add(settings);
-            }
-        }
-
-        if (result.Count == 0 && debugMode && logRandomGeneration)
-        {
-            Debug.LogWarning($"{typeName} 구종에서 속도 {targetSpeed}km/h에 맞는 설정을 찾지 못했습니다.");
-        }
-
-        return result;
-    }
-
-    /**
-     * 공의 충돌 여부를 확인하는 코루틴
-     */
-    private IEnumerator CheckBallHit(BallController ballController)
-    {
-        // 충돌 확인
-        while (!ballController.hasCollided)
-        {
-            yield return null;
-        }
-
-        if (debugMode && logBallInfo)
-        {
-            Debug.Log($"공 충돌 감지: {pendingPitchType}");
-        }
-    }
-
-    /**
-     * 일정 시간 후 공을 제거하는 코루틴
-     */
-    private IEnumerator DestroyBallAfterTime(GameObject ball, float time)
-    {
-        yield return new WaitForSeconds(time);
-
-        if (ball != null)
-        {
-            Destroy(ball);
-
-            if (debugMode && logBallInfo)
-            {
-                Debug.Log($"공 자동 제거: {time}초 후");
-            }
-        }
-    }
-
-    /**
-     * 현재 선택된 구종 이름을 반환하는 메서드
-     * @return 현재 구종 이름 (Fastball, Slider, Curve, Changeup 등)
-     */
-    public string GetCurrentPitchTypeName()
-    {
-        // 랜덤 모드이면 "Random"을 반환
-        if (isRandomMode)
-        {
-            return "Random";
-        }
-
-        // 현재 선택된 구종의 이름 가져오기
-        if (currentPitchSettings == pitchSettingsManager.fastballSettings)
-        {
-            return "Fastball";
-        }
-        else if (currentPitchSettings == pitchSettingsManager.sliderSettings)
-        {
-            return "Slider";
-        }
-        else if (currentPitchSettings == pitchSettingsManager.curveSettings)
-        {
-            return "Curve";
-        }
-        else if (currentPitchSettings == pitchSettingsManager.changeupSettings)
-        {
-            return "Changeup";
-        }
-
-        return "Unknown";
-    }
-
-    /**
-     * 현재 선택된 구속을 반환하는 메서드
-     * @return 현재 구속 (km/h)
-     */
-    public int GetCurrentPitchSpeed()
-    {
-        return speedValues[speedIndex];
-    }
-
-    /**
-     * 현재 선택된 구종과 구속 정보를 TextMeshPro로 출력하는 메서드
-     */
-    public void UpdatePitchInfoDisplay()
-    {
-        if (pitchInfoText == null)
-            return;
-
-        // 현재 선택된 구종 이름 가져오기
-        string currentPitchType = GetCurrentPitchTypeName();
-
-        // 현재 선택된 구속 가져오기
-        int currentSpeed = speedValues[speedIndex];
-
-        // 랜덤 모드 상태에 따라 다른 스타일 적용
-        if (isRandomMode)
-        {
-            pitchInfoText.text = string.Format("<color=#FF6B00>RandomMode</color>\n{0} km/h",
-                speedValues[speedIndex], speedValues[speedValues.Length - 1]);
-        }
-        else
-        {
-            // 구종별 색상 적용 (선택사항)
-            string colorHex = "#FFFFFF"; // 기본 흰색
-            if (currentPitchType == "Fastball") colorHex = "#FF0000"; // 빨강
-            else if (currentPitchType == "Slider") colorHex = "#00AAFF"; // 파랑
-            else if (currentPitchType == "Curve") colorHex = "#00FF00"; // 초록
-            else if (currentPitchType == "Changeup") colorHex = "#FFAA00"; // 주황
-
-            pitchInfoText.text = string.Format("<color={0}>{1}</color>\n{2} km/h",
-                colorHex, currentPitchType, currentSpeed);
-        }
-    }
-
-    /**
-     * 타겟 위치를 시각적으로 표시
-     */
-    private void OnDrawGizmos()
-    {
-        if (!showTargetGizmo || !Application.isPlaying)
-            return;
-
-        // 현재 타겟 위치 표시
-        Vector3 targetPos = isRandomMode ? randomTargetP : initialTargetP;
-        Gizmos.color = targetGizmoColor;
-        Gizmos.DrawSphere(targetPos, targetGizmoSize);
-
-        // 디버그 모드일 때 추가 정보 표시
-        if (debugMode)
-        {
-            // 각 구종별 범위 표시
-            foreach (var entry in pitchRangeDataMap)
-            {
-                if (entry.Key != "Default")
+                if (debugMode && logBallInfo)
                 {
-                    // 각 구종별로 다른 투명도로 표시
-                    Color rangeColor = targetGizmoColor;
-                    rangeColor.a = 0.2f;
-
-                    switch (entry.Key)
-                    {
-                        case "Fastball": rangeColor = new Color(1f, 0f, 0f, 0.2f); break; // 빨강
-                        case "Slider": rangeColor = new Color(0f, 0.5f, 1f, 0.2f); break; // 파랑
-                        case "Curve": rangeColor = new Color(0f, 1f, 0f, 0.2f); break; // 초록
-                        case "Changeup": rangeColor = new Color(1f, 0.5f, 0f, 0.2f); break; // 주황
-                    }
-
-                    Gizmos.color = rangeColor;
-                    Gizmos.DrawCube(entry.Value.position, entry.Value.size);
+                    Debug.Log($"{pendingPitchType} 공이 생성되고 발사되었습니다. 투구 스타일: {currentPitchStyle}, 속도: {pendingBallSettings.throwPower * 0.36f:F1}km/h");
                 }
             }
+
+            /**
+             * 생성된 공에 설정 적용
+             */
+            private void ApplyBallSettings(GameObject ball)
+            {
+                // BallController 컴포넌트 확인
+                BallController ballController = ball.GetComponent<BallController>();
+                if (ballController != null)
+                {
+                    // 설정 적용
+                    ballController.SetBallSettings(pendingBallSettings);
+                    ballController.SetPitchType(pendingPitchType);
+
+                    // 발사 방향 계산 및 발사
+                    ballController.CalculateDirection(releasePoint.position, isRandomMode ? randomTargetP : initialTargetP);
+                    ballController.LaunchBall();
+                    StartCoroutine(CheckBallHit(ballController));
+                }
+                else if (debugMode)
+                {
+                    Debug.LogError("볼 프리팹에 BallController 컴포넌트가 없습니다!");
+                }
+            }
+
+            /**
+             * 투구 스타일에 따른 효과 적용
+             * 각 투구 스타일에 따라 다른 물리적 특성 부여
+             */
+       
+
+            /**
+             * 목표 위치를 PitchRange 오브젝트의 중심으로 재설정하는 메서드
+             */
+            private void ResetTargetP()
+            {
+                // PitchRange 오브젝트의 위치가 변경되었을 수 있으므로 현재 위치 확인
+                if (pitchRangeObject != null)
+                {
+                    initialTargetP = pitchRangeObject.transform.position;
+                }
+
+                // 투구 스타일에 따라 타겟 위치 약간 조정
+                Vector3 styleOffset = Vector3.zero;
+                switch (currentPitchStyle)
+                {
+                    case PitchStyle.Sidearm:
+                        // 사이드암은 약간 좌우로 치우침
+                        styleOffset = new Vector3(Random.Range(-0.1f, 0.1f), 0, 0);
+                        break;
+
+                    case PitchStyle.ThreeQuarter:
+                        // 쓰리쿼터는 약간 대각선으로 치우침
+                        styleOffset = new Vector3(Random.Range(-0.05f, 0.05f), Random.Range(-0.05f, 0.05f), 0);
+                        break;
+
+                    case PitchStyle.Underhand:
+                        // 언더핸드는 약간 아래로 치우침
+                        styleOffset = new Vector3(0, Random.Range(-0.1f, 0), 0);
+                        break;
+                }
+
+                randomTargetP = initialTargetP + styleOffset;
+
+                if (debugMode && logRandomGeneration)
+                {
+                    Debug.Log($"타겟 위치 재설정: {randomTargetP} (투구 스타일: {currentPitchStyle}, 오프셋: {styleOffset})");
+                }
+            }
+
+            /**
+             * 랜덤 모드에서 무작위 공 설정을 생성하는 메서드
+             * 각 구종마다 다른 확률로 선택되며, 속도도 조정됩니다.
+             */
+            private BallSettings GetRandomBallSettings()
+            {
+                float randomValue = Random.value * 100;
+                int randomSpeed = speedValues[speedIndex];
+                List<BallSettings> possibleSettings = new List<BallSettings>();
+
+                // 확률에 따라 다른 구종 선택
+                if (randomValue < 40) // Fastball 40%
+                {
+                    possibleSettings = FindSettingsForSpeedAndType(randomSpeed, pitchSettingsManager.fastballSettings, "Fastball");
+                }
+                else if (randomValue < 60) // Changeup 20%
+                {
+                    randomSpeed -= 10; // 체인지업은 속도 감소
+                    possibleSettings = FindSettingsForSpeedAndType(randomSpeed, pitchSettingsManager.changeupSettings, "Changeup");
+                }
+                else if (randomValue < 80) // Slider 20%
+                {
+                    randomSpeed -= 10; // 슬라이더는 속도 감소
+                    possibleSettings = FindSettingsForSpeedAndType(randomSpeed, pitchSettingsManager.sliderSettings, "Slider");
+                }
+                else // Curve 20%
+                {
+                    randomSpeed -= 20; // 커브는 속도 크게 감소
+                    possibleSettings = FindSettingsForSpeedAndType(randomSpeed, pitchSettingsManager.curveSettings, "Curve");
+                }
+
+                // 가능한 설정들 중에서 랜덤 선택
+                if (possibleSettings.Count == 0)
+                {
+                    if (debugMode && logRandomGeneration)
+                    {
+                        Debug.LogWarning("랜덤 모드에서 적합한 설정을 찾지 못했습니다. 기본값 사용");
+                    }
+                    return pitchSettingsManager.fastballSettings[0]; // 기본값 사용
+                }
+
+                BallSettings selectedSettings = possibleSettings[Random.Range(0, possibleSettings.Count)];
+
+                if (debugMode && logRandomGeneration)
+                {
+                    Debug.Log($"랜덤 설정 선택: {GetPitchTypeName(selectedSettings)}, 속도: {selectedSettings.throwPower * 0.36f:F1}km/h");
+                }
+
+                return selectedSettings;
+            }
+
+            /**
+             * 특정 속도와 구종에 대한 설정 찾기
+             */
+            private List<BallSettings> FindSettingsForSpeedAndType(int targetSpeed, List<BallSettings> typeSettings, string typeName)
+            {
+                List<BallSettings> result = new List<BallSettings>();
+
+                foreach (var settings in typeSettings)
+                {
+                    if (settings.name == targetSpeed)
+                    {
+                        result.Add(settings);
+                    }
+                }
+
+                if (result.Count == 0 && debugMode && logRandomGeneration)
+                {
+                    Debug.LogWarning($"{typeName} 구종에서 속도 {targetSpeed}km/h에 맞는 설정을 찾지 못했습니다.");
+                }
+
+                return result;
+            }
+
+            /**
+             * 공의 충돌 여부를 확인하는 코루틴
+             */
+            private IEnumerator CheckBallHit(BallController ballController)
+            {
+                // 충돌 확인
+                while (!ballController.hasCollided)
+                {
+                    yield return null;
+                }
+
+                if (debugMode && logBallInfo)
+                {
+                    Debug.Log($"공 충돌 감지: {pendingPitchType}, 투구 스타일: {currentPitchStyle}");
+                }
+            }
+
+            /**
+             * 일정 시간 후 공을 제거하는 코루틴
+             */
+            private IEnumerator DestroyBallAfterTime(GameObject ball, float time)
+            {
+                yield return new WaitForSeconds(time);
+
+                if (ball != null)
+                {
+                    Destroy(ball);
+
+                    if (debugMode && logBallInfo)
+                    {
+                        Debug.Log($"공 자동 제거: {time}초 후");
+                    }
+                }
+            }
+
+            /**
+             * 현재 선택된 구종 이름을 반환하는 메서드
+             * @return 현재 구종 이름 (Fastball, Slider, Curve, Changeup 등)
+             */
+            public string GetCurrentPitchTypeName()
+            {
+                // 랜덤 모드이면 "Random"을 반환
+                if (isRandomMode)
+                {
+                    return "Random";
+                }
+
+                // 현재 선택된 구종의 이름 가져오기
+                if (currentPitchSettings == pitchSettingsManager.fastballSettings)
+                {
+                    return "Fastball";
+                }
+                else if (currentPitchSettings == pitchSettingsManager.sliderSettings)
+                {
+                    return "Slider";
+                }
+                else if (currentPitchSettings == pitchSettingsManager.curveSettings)
+                {
+                    return "Curve";
+                }
+                else if (currentPitchSettings == pitchSettingsManager.changeupSettings)
+                {
+                    return "Changeup";
+                }
+
+                return "Unknown";
+            }
+
+            /**
+             * 현재 선택된 구속을 반환하는 메서드
+             * @return 현재 구속 (km/h)
+             */
+            public int GetCurrentPitchSpeed()
+            {
+                return speedValues[speedIndex];
+            }
+
+            /**
+             * 현재 선택된 구종과 구속 정보를 TextMeshPro로 출력하는 메서드
+             */
+            public void UpdatePitchInfoDisplay()
+            {
+                if (pitchInfoText == null)
+                    return;
+
+                // 현재 선택된 구종 이름 가져오기
+                string currentPitchType = GetCurrentPitchTypeName();
+
+                // 현재 선택된 구속 가져오기
+                int currentSpeed = speedValues[speedIndex];
+
+                // 투구 스타일 텍스트
+                string styleText = GetPitchStyleText();
+
+                // 랜덤 모드 상태에 따라 다른 스타일 적용
+                if (isRandomMode)
+                {
+                    pitchInfoText.text = string.Format("<color=#FF6B00>Random</color>\n<color=#8A2BE2>{0}</color>\n{1} km/h",
+                        styleText, speedValues[speedIndex]);
+                }
+                else
+                {
+                    // 구종별 색상 적용
+                    string colorHex = "#FFFFFF"; // 기본 흰색
+                    if (currentPitchType == "Fastball") colorHex = "#FF0000"; // 빨강
+                    else if (currentPitchType == "Slider") colorHex = "#00AAFF"; // 파랑
+                    else if (currentPitchType == "Curve") colorHex = "#00FF00"; // 초록
+                    else if (currentPitchType == "Changeup") colorHex = "#FFAA00"; // 주황
+
+                    pitchInfoText.text = string.Format("<color={0}>{1}</color>\n<color=#8A2BE2>{2}</color>\n{3} km/h",
+                        colorHex, currentPitchType, styleText, currentSpeed);
+                }
+            }
+
+            /**
+             * 현재 투구 스타일의 텍스트 표현을 반환
+             */
+            private string GetPitchStyleText()
+            {
+                switch (currentPitchStyle)
+                {
+                    case PitchStyle.Overhand:
+                        return "Over";
+                    case PitchStyle.Sidearm:
+                        return "Side";
+                    case PitchStyle.ThreeQuarter:
+                        return "3Q";
+                    case PitchStyle.Underhand:
+                        return "Under";
+                    default:
+                        return "Ovr";
+                }
+            }
+
+            /**
+             * 타겟 위치를 시각적으로 표시
+             */
+            private void OnDrawGizmos()
+            {
+                if (!showTargetGizmo || !Application.isPlaying)
+                    return;
+
+                // 현재 타겟 위치 표시
+                Vector3 targetPos = isRandomMode ? randomTargetP : initialTargetP;
+
+                // 투구 스타일에 따라 기즈모 색상 변경
+                Color styleColor = targetGizmoColor;
+                switch (currentPitchStyle)
+                {
+                    case PitchStyle.Overhand:
+                        styleColor = new Color(0.5f, 0f, 1f, 0.5f); // 보라색
+                        break;
+                    case PitchStyle.Sidearm:
+                        styleColor = new Color(1f, 0.7f, 0f, 0.5f); // 주황색
+                        break;
+                    case PitchStyle.ThreeQuarter:
+                        styleColor = new Color(0f, 0.7f, 0.7f, 0.5f); // 청록색
+                        break;
+                    case PitchStyle.Underhand:
+                        styleColor = new Color(0.7f, 0.3f, 0.1f, 0.5f); // 갈색
+                        break;
+                }
+
+                Gizmos.color = styleColor;
+                Gizmos.DrawSphere(targetPos, targetGizmoSize);
+
+                // 디버그 모드일 때 추가 정보 표시
+                if (debugMode)
+                {
+                    // 각 구종별 범위 표시
+                    foreach (var entry in pitchRangeDataMap)
+                    {
+                        if (entry.Key != "Default")
+                        {
+                            // 각 구종별로 다른 투명도로 표시
+                            Color rangeColor = targetGizmoColor;
+                            rangeColor.a = 0.2f;
+
+                            switch (entry.Key)
+                            {
+                                case "Fastball": rangeColor = new Color(1f, 0f, 0f, 0.2f); break; // 빨강
+                                case "Slider": rangeColor = new Color(0f, 0.5f, 1f, 0.2f); break; // 파랑
+                                case "Curve": rangeColor = new Color(0f, 1f, 0f, 0.2f); break; // 초록
+                                case "Changeup": rangeColor = new Color(1f, 0.5f, 0f, 0.2f); break; // 주황
+                            }
+
+                            Gizmos.color = rangeColor;
+                            Gizmos.DrawCube(entry.Value.position, entry.Value.size);
+                        }
+                    }
+
+                    // 투구 스타일에 따른 예상 경로 표시
+                    Vector3 releasePos = releasePoint != null ? releasePoint.position : Vector3.zero;
+                    Gizmos.color = styleColor;
+                    Gizmos.DrawLine(releasePos, targetPos);
+
+                    // 스타일별 특성을 기즈모로 표시
+                    switch (currentPitchStyle)
+                    {
+                        case PitchStyle.Sidearm:
+                            // 사이드암 회전 표시
+                            DrawRotationGizmo(targetPos, new Vector3(0, 0, 1), 0.3f, styleColor);
+                            break;
+
+                        case PitchStyle.ThreeQuarter:
+                            // 쓰리쿼터 회전 표시
+                            DrawRotationGizmo(targetPos, new Vector3(0.5f, 0.5f, 0), 0.2f, styleColor);
+                            break;
+
+                        case PitchStyle.Underhand:
+                            // 언더핸드 회전 표시
+                            DrawRotationGizmo(targetPos, new Vector3(1, 0, 0), 0.4f, styleColor);
+                            break;
+                    }
+                }
+            }
+
+            /**
+             * 회전 방향을 나타내는 기즈모 그리기
+             */
+            private void DrawRotationGizmo(Vector3 position, Vector3 axis, float strength, Color color)
+            {
+                // 회전 축을 기준으로 원형 기즈모 표시
+                Color rotColor = color;
+                rotColor.a = 0.3f;
+                Gizmos.color = rotColor;
+
+                int segments = 16;
+                float radius = 0.15f * strength;
+                Vector3 lastPoint = position + Vector3.ProjectOnPlane(Vector3.right, axis).normalized * radius;
+
+                for (int i = 1; i <= segments; i++)
+                {
+                    float angle = i * (360f / segments) * Mathf.Deg2Rad;
+                    Vector3 direction = Vector3.ProjectOnPlane(
+                        new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0),
+                        axis
+                    ).normalized;
+
+                    Vector3 nextPoint = position + direction * radius;
+                    Gizmos.DrawLine(lastPoint, nextPoint);
+                    lastPoint = nextPoint;
+                }
+
+                // 회전 방향 화살표 표시
+                Gizmos.DrawRay(position, axis * 0.2f);
+            }
         }
-    }
-}
