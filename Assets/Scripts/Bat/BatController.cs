@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR;
 
 /// <summary>
 /// 배트 컨트롤러 클래스 - 배트의 움직임과 공과의 상호작용을 관리합니다.
@@ -58,6 +59,19 @@ public class BatController : MonoBehaviour
     public Vector3 launchPosition; // 타구 시작 위치
     public GameObject PlatePosition; // 홈 플레이트 위치
     public bool hasCollided = false; // 공이 충돌했는지 여부
+
+    [Header("VR 햅틱 피드백 설정")]
+    [SerializeField] private bool enableHaptics = true; // 햅틱 활성화 여부
+    [SerializeField] private float hapticDuration = 0.1f; // 진동 지속 시간
+    [SerializeField] private float minHapticAmplitude = 0.3f; // 최소 진동 세기
+    [SerializeField] private float maxHapticAmplitude = 1.0f; // 최대 진동 세기
+    [SerializeField] private UnityEngine.XR.InputDevice leftHandDevice; // 왼손 컨트롤러
+    [SerializeField] private UnityEngine.XR.InputDevice rightHandDevice; // 오른손 컨트롤러
+    [SerializeField] private bool useLeftHand = true; // 왼손 피드백 사용 여부
+    [SerializeField] private bool useRightHand = true; // 오른손 피드백 사용 여부
+    [SerializeField] private float leftHandIntensityMultiplier = 1.0f; // 왼손 진동 세기 계수
+    [SerializeField] private float rightHandIntensityMultiplier = 1.0f; // 오른손 진동 세기 계수
+
 
     // 거리 계산 관련 비공개 변수
     private bool isCalculatingDistance = false; // 거리 계산 중인지 여부
@@ -170,6 +184,100 @@ public class BatController : MonoBehaviour
 
         // 타격 기록 초기화 코루틴 시작
         StartCoroutine(ClearHitBallsRoutine());
+
+        InitializeControllerDevices();
+
+    }
+
+    /// <summary>
+    /// 양손 컨트롤러 장치를 초기화합니다.
+    /// </summary>
+    private void InitializeControllerDevices()
+    {
+        // 왼손 컨트롤러 초기화
+        List<UnityEngine.XR.InputDevice> leftHandDevices = new List<UnityEngine.XR.InputDevice>();
+        UnityEngine.XR.InputDevices.GetDevicesAtXRNode(XRNode.LeftHand, leftHandDevices);
+
+        if (leftHandDevices.Count > 0)
+        {
+            leftHandDevice = leftHandDevices[0];
+            Debug.Log($"왼손 햅틱 피드백 장치 초기화: {leftHandDevice.name}");
+        }
+        else
+        {
+            Debug.LogWarning("왼손 XR 입력 장치를 찾을 수 없습니다");
+        }
+
+        // 오른손 컨트롤러 초기화
+        List<UnityEngine.XR.InputDevice> rightHandDevices = new List<UnityEngine.XR.InputDevice>();
+        UnityEngine.XR.InputDevices.GetDevicesAtXRNode(XRNode.RightHand, rightHandDevices);
+
+        if (rightHandDevices.Count > 0)
+        {
+            rightHandDevice = rightHandDevices[0];
+            Debug.Log($"오른손 햅틱 피드백 장치 초기화: {rightHandDevice.name}");
+        }
+        else
+        {
+            Debug.LogWarning("오른손 XR 입력 장치를 찾을 수 없습니다");
+        }
+    }
+
+    /// <summary>
+    /// 양손 컨트롤러에 햅틱 피드백(진동)을 보냅니다.
+    /// </summary>
+    /// <param name="amplitude">기본 진동 세기 (0.0f ~ 1.0f)</param>
+    /// <param name="duration">진동 지속 시간 (초)</param>
+    private void SendHapticFeedbackToBothHands(float amplitude, float duration)
+    {
+        if (!enableHaptics)
+            return;
+
+        // 진동 세기를 0~1 사이로 클램핑
+        amplitude = Mathf.Clamp01(amplitude);
+
+        // 왼손 햅틱 피드백
+        if (useLeftHand && leftHandDevice.isValid)
+        {
+            SendHapticToDevice(leftHandDevice, amplitude * leftHandIntensityMultiplier, duration);
+        }
+
+        // 오른손 햅틱 피드백
+        if (useRightHand && rightHandDevice.isValid)
+        {
+            SendHapticToDevice(rightHandDevice, amplitude * rightHandIntensityMultiplier, duration);
+        }
+    }
+
+    /// <summary>
+    /// 지정된 컨트롤러 장치에 햅틱 피드백을 보냅니다.
+    /// </summary>
+    /// <param name="device">타겟 컨트롤러 장치</param>
+    /// <param name="amplitude">진동 세기 (0.0f ~ 1.0f)</param>
+    /// <param name="duration">진동 지속 시간 (초)</param>
+    private void SendHapticToDevice(UnityEngine.XR.InputDevice device, float amplitude, float duration)
+    {
+        // 진동 세기를 0~1 사이로 클램핑
+        amplitude = Mathf.Clamp01(amplitude);
+
+        // HapticCapabilities 확인
+        if (device.TryGetHapticCapabilities(out UnityEngine.XR.HapticCapabilities capabilities))
+        {
+            if (capabilities.supportsImpulse)
+            {
+                uint channel = 0; // 기본 채널 사용
+                device.SendHapticImpulse(channel, amplitude, duration);
+                Debug.Log($"햅틱 피드백 전송 ({device.name}): 세기={amplitude:F2}, 지속시간={duration:F2}");
+            }
+            else
+            {
+                Debug.LogWarning($"장치 ({device.name})가 햅틱 임펄스를 지원하지 않습니다.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"장치 ({device.name})의 햅틱 기능을 가져올 수 없습니다.");
+        }
     }
 
     /// <summary>
@@ -195,6 +303,11 @@ public class BatController : MonoBehaviour
         if (hasLanded)
         {
             Debug.DrawLine(launchPosition, new Vector3(transform.position.x, launchPosition.y, transform.position.z), Color.red);
+        }
+
+        if (enableHaptics && (!leftHandDevice.isValid || !rightHandDevice.isValid))
+        {
+            InitializeControllerDevices();
         }
     }
 
@@ -315,6 +428,7 @@ public class BatController : MonoBehaviour
         // "Ball" 태그를 가진 오브젝트이고, 이미 타격한 목록에 없을 때, 또는 "TeeBall"인 경우
         if ((ballCollider.CompareTag("Ball") && !hitBalls.Contains(ballCollider)) || (ballCollider.CompareTag("TeeBall")))
         {
+
             // 충돌 기록에 추가
             hitBalls.Add(ballCollider);
 
@@ -359,6 +473,8 @@ public class BatController : MonoBehaviour
                     qualityFactor = Mathf.Lerp(1.0f, minQualityFactor, normalizedDistance);
                 }
 
+                float hapticAmplitude = Mathf.Lerp(minHapticAmplitude, maxHapticAmplitude, qualityFactor * Mathf.Clamp01(batSpeed / 20f));
+                SendHapticFeedbackToBothHands(hapticAmplitude, hapticDuration * qualityFactor);
                 // 또는 지수 감소 함수 사용 (더 현실적)
                 // float qualityFactor = Mathf.Max(minQualityFactor, Mathf.Exp(-distanceToSweetSpot * sweetSpotFalloffRate));
 

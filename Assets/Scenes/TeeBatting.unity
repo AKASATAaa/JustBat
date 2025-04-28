@@ -5931,7 +5931,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ac276ee02b88554ab1cff7e9f2e63ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitForceMultiplier: 1.1
+  hitForceMultiplier: 1.4
   batSweetSpot: {fileID: 13330775}
   ballLayer:
     serializedVersion: 2
@@ -5970,6 +5970,14 @@ MonoBehaviour:
   launchPosition: {x: 0, y: 0, z: 0}
   PlatePosition: {fileID: 909283126}
   hasCollided: 0
+  enableHaptics: 1
+  hapticDuration: 0.1
+  minHapticAmplitude: 0.3
+  maxHapticAmplitude: 1
+  useLeftHand: 1
+  useRightHand: 1
+  leftHandIntensityMultiplier: 1
+  rightHandIntensityMultiplier: 1
   currentVelocity: {x: 0, y: 0, z: 0}
 --- !u!54 &33494988737231317
 Rigidbody:
