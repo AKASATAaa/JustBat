@@ -10,6 +10,8 @@ TagManager:
   - TeeBall
   - TeeBallArea
   - Ground
+  - HomeRUnZone
+  - HomeRunZone
   layers:
   - Default
   - TransparentFX

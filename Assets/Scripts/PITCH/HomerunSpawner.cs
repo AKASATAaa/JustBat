@@ -1,155 +1,239 @@
-/**
- * HomerunSpawner.cs - È¨·± ´õºñ¿ë °ø »ı¼º ¹× ¹ß»ç Á¦¾î ÄÄÆ÷³ÍÆ®
+ï»¿/**
+ * BallSpawner.cs - ê³µ ìƒì„± ë° ë°œì‚¬ ì œì–´ ì»´í¬ë„ŒíŠ¸
  * 
- * ÀÌ ½ºÅ©¸³Æ®´Â È¨·± ´õºñ ¸ğµå¿¡¼­ °øÀ» »ı¼ºÇÏ°í ¹ß»çÇÏ´Â ¿ªÇÒÀ» ´ã´çÇÕ´Ï´Ù.
- * ÁöÁ¤µÈ È½¼ö(15°³)¸¸Å­ °øÀ» »ı¼ºÇÏ¸ç, ´Ù½ÃÇÏ±â ±â´ÉÀ» ÅëÇØ ÃÊ±âÈ­ÇÒ ¼ö ÀÖ½À´Ï´Ù.
+ * ì´ ìŠ¤í¬ë¦½íŠ¸ëŠ” í™ˆëŸ° ë”ë¹„ ëª¨ë“œì—ì„œ ê³µì„ ì£¼ê¸°ì ìœ¼ë¡œ ìƒì„±í•˜ê³  ë°œì‚¬í•˜ëŠ” ì—­í• ì„ ë‹´ë‹¹í•©ë‹ˆë‹¤.
+ * ì‹œê°„ ì œí•œ ë‚´ì— ìë™ìœ¼ë¡œ ê³µì„ ìƒì„±í•˜ê³ , ì´ì „ ê³µì´ ì§€ë©´ì— ë‹¿ìœ¼ë©´ ë‹¤ìŒ ê³µì„ ë°œì‚¬í•©ë‹ˆë‹¤.
  */
 
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class HomerunSpawner : MonoBehaviour
 {
-    [Header("°ø »ı¼º ¼³Á¤")]
-    [Tooltip("°ø ÀÚµ¿ ¼Ò¸ê ½Ã°£ (ÃÊ)")]
+    [Header("ê³µ ìƒì„± ì„¤ì •")]
+    [Tooltip("ê³µ ìë™ ì†Œë©¸ ì‹œê°„ (ì´ˆ)")]
     public float destroyTime = 5.0f;
 
-    [Tooltip("»ı¼ºÇÒ °øÀÇ ÇÁ¸®ÆÕ")]
+    [Tooltip("ìƒì„±í•  ê³µì˜ í”„ë¦¬íŒ¹")]
     public GameObject ballPrefab;
 
-    [Tooltip("°ø ¹ß»ç À§Ä¡")]
+    [Tooltip("ê³µ ë°œì‚¬ ìœ„ì¹˜")]
     public Transform releasePoint;
 
-    [Header("¾Ö´Ï¸ŞÀÌ¼Ç ¼³Á¤")]
-    [Tooltip("Åõ¼ö ¾Ö´Ï¸ŞÀÌÅÍ ÄÄÆ÷³ÍÆ®")]
+    [Header("ì• ë‹ˆë©”ì´ì…˜ ì„¤ì •")]
+    [Tooltip("íˆ¬ìˆ˜ ì• ë‹ˆë©”ì´í„° ì»´í¬ë„ŒíŠ¸")]
     public Animator pitcherAnimator;
 
-    [Tooltip("¾Ö´Ï¸ŞÀÌ¼Ç Æ®¸®°Å ÆÄ¶ó¹ÌÅÍ ÀÌ¸§")]
+    [Tooltip("ì• ë‹ˆë©”ì´ì…˜ íŠ¸ë¦¬ê±° íŒŒë¼ë¯¸í„° ì´ë¦„")]
     public string idleAnimTrigger = "Idle";
-    public string readyAnimTrigger = "Ready";
-    public string pitchAnimTrigger = "PitchOverhand";
+    public string pitchAnimTrigger = "Pitch";
 
-    [Header("È¨·± ´õºñ ¼³Á¤")]
-    [Tooltip("ÃÑ ¹ß»çÇÒ °øÀÇ °³¼ö")]
-    public int totalBallCount = 15;
+    [Header("ë²„íŠ¼ ì˜¤ë¸Œì íŠ¸")]
+    [Tooltip("ë‹¤ì‹œ ì‹œì‘ ë²„íŠ¼")]
+    public Button againButton;
 
-    [Tooltip("°ø ¹ß»ç °£°İ (ÃÊ)")]
-    public float pitchInterval = 5.0f;
+    [Header("ë¬¼ë¦¬ ì •ë³´")]
+    [Tooltip("ê³µì˜ ì¶©ëŒ ê°ë„")]
+    public float hitAngle;
 
-    [Tooltip("´Ù½ÃÇÏ±â ¹öÆ°")]
-    public Button restartButton;
+    [Tooltip("ê³µì˜ ì†ë„ (km/h)")]
+    public float ballSpeed;
 
-    [Tooltip("³²Àº °ø °³¼ö Ç¥½Ã ÅØ½ºÆ®")]
-    public TextMeshProUGUI ballCountText;
+    [Tooltip("íƒ€ê²© ì†ë„ (km/h)")]
+    public float hitSpeed;
 
-    [Header("°ø ¹°¸® ¼³Á¤")]
-    [Tooltip("Åõ±¸ ÆÄ¿ö (¼Óµµ)")]
-    public float initialForce = 100.0f;
+    [Tooltip("ë°œì‚¬ ê°ë„ (ë„)")]
+    public float launchAngle;
 
-    [Tooltip("¼öÁ÷ È¸Àü ¼Óµµ")]
-    public float verticalRotationSpeed = 0.0f;
+    [Tooltip("ì˜ˆìƒ ë¹„í–‰ ê±°ë¦¬ (m)")]
+    public float expectedDistance;
 
-    [Tooltip("ZÃà È¸Àü ¼Óµµ")]
-    public float horizontalRotationSpeed = 0.0f;
-
-    [Tooltip("¼öÁ÷ ¿ÀÇÁ¼Â")]
-    public float verticalAngleOffset = 0.0f;
-
-    [Tooltip("¼öÆò ¿ÀÇÁ¼Â")]
-    public float horizontalAngleOffset = 0.0f;
-
-    [Tooltip("°ø XÃà °¢µµ")]
-    public float initialRotationAngleX = 0.0f;
-
-    [Tooltip("°ø ZÃà °¢µµ")]
-    public float initialRotationAngleZ = 0.0f;
-
-    [Tooltip("Á¦µ¿ ½ÃÀÛ ½Ã°£")]
-    public float brakingDelay = 0.0f;
-
-    [Tooltip("ÃÖ´ë Èçµé¸²")]
-    public float maxWobble = 0.0f;
-
-    [Header("Å¸°Ù ¼³Á¤")]
-    [Tooltip("Å¸°ÙÇÒ ½ºÆ®¶óÀÌÅ© Á¸ ¿ÀºêÁ§Æ®")]
+    [Header("íƒ€ê²Ÿ ì„¤ì •")]
+    [Tooltip("íƒ€ê²Ÿí•  ìŠ¤íŠ¸ë¼ì´í¬ ì¡´ ì˜¤ë¸Œì íŠ¸")]
     public GameObject pitchRangeObject;
 
-    [Header("µğ¹ö±× ¼³Á¤")]
-    [Tooltip("µğ¹ö±× ¸ğµå È°¼ºÈ­ ¿©ºÎ")]
+    [Header("UI ì •ë³´ í‘œì‹œ")]
+    [Tooltip("êµ¬ì¢…ê³¼ êµ¬ì† ì •ë³´ë¥¼ í‘œì‹œí•  TextMeshPro ì»´í¬ë„ŒíŠ¸")]
+    public TextMeshProUGUI pitchInfoText;
+
+    [Header("ì‹œê°„ ì œí•œ ì„¤ì •")]
+    [Tooltip("ê²Œì„ ì‹œê°„ ì œí•œ (ë¶„)")]
+    public float timeLimitInMinutes = 4.0f;
+    [Tooltip("ë‚¨ì€ ì‹œê°„ì„ í‘œì‹œí•  TextMeshPro ì»´í¬ë„ŒíŠ¸")]
+    public TextMeshPro timeRemainingText;
+
+    [Header("ë””ë²„ê·¸ ì„¤ì •")]
+    [Tooltip("ë””ë²„ê·¸ ëª¨ë“œ í™œì„±í™” ì—¬ë¶€")]
     public bool debugMode = false;
 
-    [Tooltip("°ø ¹ß»ç Á¤º¸ ·Î±× Ãâ·Â ¿©ºÎ")]
+    [Tooltip("ê³µ ë°œì‚¬ ì •ë³´ ë¡œê·¸ ì¶œë ¥ ì—¬ë¶€")]
     public bool logBallInfo = true;
 
-    [Tooltip("¾Ö´Ï¸ŞÀÌ¼Ç ÀÌº¥Æ® ·Î±× Ãâ·Â ¿©ºÎ")]
+    [Tooltip("ì• ë‹ˆë©”ì´ì…˜ ì´ë²¤íŠ¸ ë¡œê·¸ ì¶œë ¥ ì—¬ë¶€")]
     public bool logAnimationEvents = true;
 
-    [Tooltip("Å¸°Ù À§Ä¡ ±âÁî¸ğ Ç¥½Ã ¿©ºÎ")]
+    [Tooltip("íƒ€ê²Ÿ ìœ„ì¹˜ ê¸°ì¦ˆëª¨ í‘œì‹œ ì—¬ë¶€")]
     public bool showTargetGizmo = true;
 
-    [Tooltip("Å¸°Ù À§Ä¡ ±âÁî¸ğ »ö»ó")]
+    [Tooltip("íƒ€ê²Ÿ ìœ„ì¹˜ ê¸°ì¦ˆëª¨ ìƒ‰ìƒ")]
     public Color targetGizmoColor = new Color(1f, 0.5f, 0f, 0.5f);
 
-    [Tooltip("Å¸°Ù À§Ä¡ ±âÁî¸ğ Å©±â")]
+    [Tooltip("íƒ€ê²Ÿ ìœ„ì¹˜ ê¸°ì¦ˆëª¨ í¬ê¸°")]
     public float targetGizmoSize = 0.1f;
 
-    // ÇöÀç ³²Àº °ø °³¼ö
-    private int remainingBallCount;
+    [Header("í™ˆëŸ° ì •ë³´")]
+    [Tooltip("í™ˆëŸ° ì¹´ìš´íŠ¸ë¥¼ í‘œì‹œí•  TextMeshPro ì»´í¬ë„ŒíŠ¸")]
+    public TextMeshPro homeRunCountText;
 
-    // Åõ±¸ ½ÃÄö½º ÁøÇà Áß ¿©ºÎ
-    private bool isPitchingSequenceActive = false;
 
-    // ¸ñÇ¥ À§Ä¡ °ü·Ã º¯¼ö
-    private Vector3 targetPosition;
+    private int homeRunCount = 0;
+    private int totalPitchCount = 0;
 
-    // ¾Ö´Ï¸ŞÀÌ¼Ç »óÅÂ °ü¸®
+
+    public AudioSource homeRunSound;
+    // í˜„ì¬ íˆ¬êµ¬ ì •ë³´
+    public string pitchTypeName = "HomeRunDerby";
+
+    // êµ¬ì¢… ë° ì†ë„ ì„¤ì • ê´€ë ¨ ë³€ìˆ˜
+    private PitchSettingsManager pitchSettingsManager;
+    private List<BallSettings> currentPitchSettings;
+    private int speedIndex;
+    private int[] speedValues = { 130 }; // í™ˆëŸ° ë”ë¹„ ëª¨ë“œì—ì„œëŠ” ê³ ì • ì†ë„ ì‚¬ìš©
+
+    // ëª©í‘œ ìœ„ì¹˜ ê´€ë ¨ ë³€ìˆ˜
+    private Vector3 initialTargetP;
+    private Vector3 targetP;
+    private Vector3 pitchRangeSize; // PitchRange ì˜¤ë¸Œì íŠ¸ì˜ í¬ê¸°
+
+    // ì• ë‹ˆë©”ì´ì…˜ ì´ë²¤íŠ¸ì—ì„œ ì‚¬ìš©í•  ë³€ìˆ˜
+    private bool isIdleAnimationInProgress = false;
+    private bool isPitchAnimationInProgress = false;
+    private BallSettings pendingBallSettings;
+
+    // ì‹œê°„ ì œí•œ ê´€ë ¨ ë³€ìˆ˜
+    private float timeRemaining;
+    private bool isGameActive = false;
+    private bool canSpawnBall = true;
+    private GameObject currentBall;
+
+    // ì• ë‹ˆë©”ì´ì…˜ ìƒíƒœ ê´€ë¦¬
     private enum AnimationState
     {
         Idle,
-        Ready,
         Pitching,
         None
     }
 
     private AnimationState currentAnimState = AnimationState.None;
 
-    // ¾Ö´Ï¸ŞÀÌ¼Ç ÀÌº¥Æ®¿¡¼­ »ç¿ëÇÒ º¯¼ö
-    private bool isIdleAnimationInProgress = false;
-    private bool isReadyAnimationInProgress = false;
-    private bool isPitchAnimationInProgress = false;
-
     /**
-     * ÃÊ±âÈ­ ¸Ş¼­µå
-     * ÃÊ±â ¼³Á¤ ¹× ¹öÆ° ÀÌº¥Æ®¸¦ ¼³Á¤ÇÕ´Ï´Ù.
+     * ì´ˆê¸°í™” ë©”ì„œë“œ
      */
     void Start()
     {
-        // ¾Ö´Ï¸ŞÀÌÅÍ ÄÄÆ÷³ÍÆ® È®ÀÎ
+        // êµ¬ì¢… ì„¤ì • ê´€ë¦¬ì ì°¾ê¸°
+        InitializePitchSettingsManager();
+
+        // UI ì •ë³´ ì—…ë°ì´íŠ¸
+        UpdatePitchInfoDisplay();
+
+        UpdateHomeRunDisplay();
+
+
+        // ì• ë‹ˆë©”ì´í„° ì»´í¬ë„ŒíŠ¸ í™•ì¸
         CheckAnimatorComponent();
 
-        // Å¸°Ù À§Ä¡ ÃÊ±âÈ­
-        InitializeTargetPosition();
+        // í™ˆëŸ° ë”ë¹„ ì„¤ì • ì„ íƒ
+        currentPitchSettings = pitchSettingsManager.homeRunDerbySettings;
+        speedIndex = 0;
 
-        // ¹öÆ° ÀÌº¥Æ® ¿¬°á
-        SetupRestartButton();
+        homeRunCount = 0;
+        totalPitchCount = 0;
 
-        // ÃÊ±â °ø °³¼ö ¼³Á¤
-        InitializeBallCount();
+        // PitchRange ì˜¤ë¸Œì íŠ¸ ì„¤ì •
+        InitializePitchRange();
 
-        // Åõ±¸ ½ÃÄö½º ½ÃÀÛ
-        StartPitchingSequence();
+        // ë²„íŠ¼ ì´ë²¤íŠ¸ ì—°ê²°
+        if (againButton != null)
+        {
+            againButton.onClick.RemoveAllListeners();
+            againButton.onClick.AddListener(RestartGame);
+        }
+
+        // ê²Œì„ ì‹œì‘
+        RestartGame();
 
         if (debugMode)
         {
-            Debug.Log("HomerunSpawner ÃÊ±âÈ­ ¿Ï·á");
+            Debug.Log("BallSpawner ì´ˆê¸°í™” ì™„ë£Œ");
         }
     }
 
     /**
-     * ¾Ö´Ï¸ŞÀÌÅÍ ÄÄÆ÷³ÍÆ® È®ÀÎ
+     * ê²Œì„ ì¬ì‹œì‘ ë©”ì„œë“œ
+     */
+    public void RestartGame()
+    {
+        // ê¸°ì¡´ì— ìƒì„±ëœ ê³µ ì œê±°
+        if (currentBall != null)
+        {
+            Destroy(currentBall);
+            currentBall = null;
+        }
+
+        homeRunCount = 0;
+        totalPitchCount = 0;
+        UpdateHomeRunDisplay();
+
+        // ì‹œê°„ ì´ˆê¸°í™”
+        timeRemaining = timeLimitInMinutes * 60;
+
+        // ê²Œì„ í™œì„±í™”
+        isGameActive = true;
+        canSpawnBall = true;
+
+        // ì• ë‹ˆë©”ì´ì…˜ ì´ˆê¸°í™”
+        StartIdleAnimation();
+
+        if (debugMode)
+        {
+            Debug.Log($"ê²Œì„ ì¬ì‹œì‘: ì œí•œ ì‹œê°„ {timeRemaining}ì´ˆ");
+        }
+
+        // ìë™ íˆ¬êµ¬ ì½”ë£¨í‹´ ì‹œì‘
+        StartCoroutine(AutomaticPitchingSequence());
+    }
+
+    /**
+     * íˆ¬êµ¬ ì„¤ì • ê´€ë¦¬ì ì´ˆê¸°í™”
+     */
+    private void InitializePitchSettingsManager()
+    {
+        pitchSettingsManager = FindObjectOfType<PitchSettingsManager>();
+
+        if (pitchSettingsManager == null && debugMode)
+        {
+            Debug.LogError("PitchSettingsManagerë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤!");
+        }
+
+        // PitchSettingsManagerì— HomeRunDerbySettingsê°€ ì—†ëŠ” ê²½ìš° í™•ì¸
+        if (pitchSettingsManager != null &&
+            (pitchSettingsManager.homeRunDerbySettings == null ||
+             pitchSettingsManager.homeRunDerbySettings.Count == 0))
+        {
+            Debug.LogError("HomeRunDerbySettingsê°€ ì„¤ì •ë˜ì–´ ìˆì§€ ì•ŠìŠµë‹ˆë‹¤!");
+
+            // ê¸°ë³¸ê°’ìœ¼ë¡œ fastballSettings ì‚¬ìš©
+            pitchSettingsManager.homeRunDerbySettings = pitchSettingsManager.fastballSettings;
+        }
+    }
+
+    /**
+     * ì• ë‹ˆë©”ì´í„° ì»´í¬ë„ŒíŠ¸ í™•ì¸
      */
     private void CheckAnimatorComponent()
     {
@@ -158,16 +242,17 @@ public class HomerunSpawner : MonoBehaviour
             pitcherAnimator = GetComponent<Animator>();
             if (pitcherAnimator == null && debugMode)
             {
-                Debug.LogError("Åõ¼ö ¾Ö´Ï¸ŞÀÌÅÍ¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù. ÄÄÆ÷³ÍÆ®¸¦ Ãß°¡ÇÏ°Å³ª ÂüÁ¶¸¦ ¼³Á¤ÇØÁÖ¼¼¿ä.");
+                Debug.LogError("íˆ¬ìˆ˜ ì• ë‹ˆë©”ì´í„°ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. ì»´í¬ë„ŒíŠ¸ë¥¼ ì¶”ê°€í•˜ê±°ë‚˜ ì°¸ì¡°ë¥¼ ì„¤ì •í•´ì£¼ì„¸ìš”.");
             }
         }
     }
 
-    /**
-     * Å¸°Ù À§Ä¡ ÃÊ±âÈ­
+    /** 
+     * PitchRange ì˜¤ë¸Œì íŠ¸ ì´ˆê¸°í™” ë©”ì„œë“œ
      */
-    private void InitializeTargetPosition()
+    private void InitializePitchRange()
     {
+        // PitchRange ì˜¤ë¸Œì íŠ¸ê°€ ì„¤ì •ë˜ì§€ ì•Šì€ ê²½ìš° ì°¾ì•„ë³´ê¸°
         if (pitchRangeObject == null)
         {
             pitchRangeObject = GameObject.Find("PitchRange");
@@ -175,151 +260,233 @@ public class HomerunSpawner : MonoBehaviour
             {
                 if (debugMode)
                 {
-                    Debug.LogWarning("PitchRange ¿ÀºêÁ§Æ®¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù. ±âº» À§Ä¡°ªÀ» »ç¿ëÇÕ´Ï´Ù.");
+                    Debug.LogWarning("PitchRange ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. ê¸°ë³¸ ìœ„ì¹˜ê°’ì„ ì‚¬ìš©í•©ë‹ˆë‹¤.");
                 }
-                targetPosition = new Vector3(5f, 0.822f, -1.81f);
+                initialTargetP = new Vector3(5f, 0.822f, -1.81f);
+                pitchRangeSize = new Vector3(0.3f, 0.3f, 0f);
                 return;
             }
         }
 
-        targetPosition = pitchRangeObject.transform.position;
-    }
+        // PitchRangeì˜ ìœ„ì¹˜ì™€ í¬ê¸° ê°€ì ¸ì˜¤ê¸°
+        initialTargetP = pitchRangeObject.transform.position;
 
-    /**
-     * ´Ù½ÃÇÏ±â ¹öÆ° ¼³Á¤
-     */
-    private void SetupRestartButton()
-    {
-        if (restartButton != null)
+        // Colliderë‚˜ Rendererë¡œë¶€í„° ì˜¤ë¸Œì íŠ¸ í¬ê¸° ì–»ê¸°
+        Collider rangeCollider = pitchRangeObject.GetComponent<Collider>();
+        Renderer rangeRenderer = pitchRangeObject.GetComponent<Renderer>();
+
+        if (rangeCollider != null)
         {
-            restartButton.onClick.RemoveAllListeners();
-            restartButton.onClick.AddListener(RestartHomerunDerby);
+            // Colliderì˜ bounds í¬ê¸° ì‚¬ìš©
+            pitchRangeSize = rangeCollider.bounds.size;
         }
-        else if (debugMode)
+        else if (rangeRenderer != null)
         {
-            Debug.LogWarning("´Ù½ÃÇÏ±â ¹öÆ°ÀÌ ¼³Á¤µÇÁö ¾Ê¾Ò½À´Ï´Ù.");
+            // Rendererì˜ bounds í¬ê¸° ì‚¬ìš©
+            pitchRangeSize = rangeRenderer.bounds.size;
         }
-    }
-
-    /**
-     * °ø °³¼ö ÃÊ±âÈ­
-     */
-    private void InitializeBallCount()
-    {
-        remainingBallCount = totalBallCount;
-        UpdateBallCountDisplay();
-    }
-
-    /**
-     * °ø °³¼ö Ç¥½Ã ¾÷µ¥ÀÌÆ®
-     */
-    private void UpdateBallCountDisplay()
-    {
-        if (ballCountText != null)
+        else
         {
-            ballCountText.text = $"³²Àº °ø: {remainingBallCount} / {totalBallCount}";
-        }
-    }
+            // ê¸°ë³¸ í¬ê¸° ì„¤ì •
+            pitchRangeSize = new Vector3(0.3f, 0.3f, 0f);
 
-    /**
-     * È¨·± ´õºñ ´Ù½Ã ½ÃÀÛ
-     */
-    public void RestartHomerunDerby()
-    {
-        // ÁøÇà ÁßÀÎ ÄÚ·çÆ¾ Á¤Áö
-        StopAllCoroutines();
-
-        // °ø °³¼ö ÃÊ±âÈ­
-        InitializeBallCount();
-
-        // Åõ±¸ ½ÃÄö½º Àç½ÃÀÛ
-        StartPitchingSequence();
-
-        if (debugMode)
-        {
-            Debug.Log("È¨·± ´õºñ ´Ù½Ã ½ÃÀÛ");
-        }
-    }
-
-    /**
-     * Åõ±¸ ½ÃÄö½º ½ÃÀÛ
-     */
-    private void StartPitchingSequence()
-    {
-        if (isPitchingSequenceActive)
-            return;
-
-        isPitchingSequenceActive = true;
-        StartCoroutine(PitchingSequence());
-    }
-
-    /**
-     * Åõ±¸ ½ÃÄö½º ÄÚ·çÆ¾
-     */
-    private IEnumerator PitchingSequence()
-    {
-        yield return new WaitForSeconds(1.0f); // ÃÊ±â ´ë±â ½Ã°£
-
-        while (remainingBallCount > 0)
-        {
-            // ¾Ö´Ï¸ŞÀÌ¼Ç ½ÃÄö½º ½ÃÀÛ
-            StartCoroutine(AnimatedPitchingSequence());
-
-            // ÇÑ Åõ±¸ ¿Ï·á ÈÄ ´ë±â
-            yield return new WaitForSeconds(pitchInterval);
-        }
-
-        isPitchingSequenceActive = false;
-
-        if (debugMode)
-        {
-            Debug.Log("¸ğµç °ø ¼ÒÁø, Åõ±¸ ½ÃÄö½º Á¾·á");
-        }
-    }
-
-    /**
-     * ¾Ö´Ï¸ŞÀÌ¼Ç ±â¹İÀÇ Åõ±¸ ½ÃÄö½º¸¦ Á¦¾îÇÏ´Â ÄÚ·çÆ¾
-     */
-    private IEnumerator AnimatedPitchingSequence()
-    {
-        // ÃÊ±â »óÅÂ ¼³Á¤
-        currentAnimState = AnimationState.None;
-        isIdleAnimationInProgress = false;
-        isReadyAnimationInProgress = false;
-        isPitchAnimationInProgress = false;
-
-        // Ã³À½¿¡´Â Idle ¾Ö´Ï¸ŞÀÌ¼ÇÀ¸·Î ½ÃÀÛ
-        StartIdleAnimation();
-
-        // ¾Ö´Ï¸ŞÀÌ¼Ç ½ÃÄö½º°¡ ¿Ï·áµÉ ¶§±îÁö ´ë±â
-        while (currentAnimState != AnimationState.None)
-        {
-            // ÇöÀç ¾Ö´Ï¸ŞÀÌ¼Ç »óÅÂ¿¡ µû¶ó ´ÙÀ½ »óÅÂ·Î ÀüÈ¯
-            switch (currentAnimState)
+            if (debugMode)
             {
-                case AnimationState.Idle:
-                    if (!isIdleAnimationInProgress)
-                    {
-                        // Idle ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ ³¡³µÀ¸¸é Ready ¾Ö´Ï¸ŞÀÌ¼Ç ½ÃÀÛ
-                        StartReadyAnimation();
-                    }
-                    break;
+                Debug.LogWarning("PitchRange ì˜¤ë¸Œì íŠ¸ì—ì„œ í¬ê¸°ë¥¼ ê°€ì ¸ì˜¬ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. ê¸°ë³¸ í¬ê¸°ë¥¼ ì‚¬ìš©í•©ë‹ˆë‹¤.");
+            }
+        }
 
-                case AnimationState.Ready:
-                    if (!isReadyAnimationInProgress)
+        // íƒ€ê²Ÿ ìœ„ì¹˜ ì´ˆê¸°í™”
+        targetP = initialTargetP;
+
+        if (debugMode)
+        {
+            Debug.Log($"PitchRange ì´ˆê¸°í™”: ìœ„ì¹˜={initialTargetP}, í¬ê¸°={pitchRangeSize}");
+        }
+    }
+
+    /**
+     * ì—…ë°ì´íŠ¸ ë©”ì„œë“œ
+     * ì‹œê°„ ì œí•œ ë° UI ì—…ë°ì´íŠ¸ë¥¼ ì²˜ë¦¬í•©ë‹ˆë‹¤.
+     */
+    void Update()
+    {
+        // ê²Œì„ì´ í™œì„±í™”ëœ ìƒíƒœë¼ë©´ ì‹œê°„ ì¹´ìš´íŠ¸ë‹¤ìš´
+        if (isGameActive)
+        {
+            timeRemaining -= Time.deltaTime;
+
+            // ì‹œê°„ ì¢…ë£Œ ì²˜ë¦¬
+            if (timeRemaining <= 0)
+            {
+                timeRemaining = 0;
+                isGameActive = false;
+
+                if (debugMode)
+                {
+                    Debug.Log("ê²Œì„ ì‹œê°„ ì¢…ë£Œ!");
+                }
+            }
+
+            // ì‹œê°„ í‘œì‹œ UI ì—…ë°ì´íŠ¸
+            UpdateTimeDisplay();
+        }
+
+        CheckCurrentBall();
+
+        // í˜„ì¬ ë³¼ì´ ì§€ë©´ì— ë‹¿ì•˜ëŠ”ì§€ í™•ì¸
+    }
+
+    /**
+ * í˜„ì¬ ë³¼ ìƒíƒœ í™•ì¸
+ * ì°©ì§€ ë° í™ˆëŸ° ì—¬ë¶€ ì²´í¬
+ */
+    private void CheckCurrentBall()
+    {
+        if (currentBall != null)
+        {
+            BallController ballController = currentBall.GetComponent<BallController>();
+            if (ballController != null)
+            {
+                // í™ˆëŸ° ì²´í¬
+                if (ballController.IsHomeRun() && !ballController.isHomeRunCounted)
+                {
+                    // í™ˆëŸ° ì¹´ìš´íŠ¸ ì¦ê°€
+                    homeRunCount++;
+                    ballController.isHomeRunCounted = true;
+                    UpdateHomeRunDisplay();
+
+                    // í™ˆëŸ° ì‚¬ìš´ë“œ ì¬ìƒ
+                    if (homeRunSound != null && !homeRunSound.isPlaying)
                     {
-                        // Ready ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ ³¡³µÀ¸¸é Pitch ¾Ö´Ï¸ŞÀÌ¼Ç ½ÃÀÛ
+                        homeRunSound.Play();
+                    }
+
+                    if (debugMode)
+                    {
+                        Debug.Log($"í™ˆëŸ°! í˜„ì¬ í™ˆëŸ° ìˆ˜: {homeRunCount} / {totalPitchCount}");
+                    }
+                }
+
+                // ì°©ì§€ ì²´í¬
+                if (ballController.hasLanded)
+                {
+                    // ë³¼ì´ ì§€ë©´ì— ë‹¿ì•˜ìœ¼ë©´ ë‹¤ìŒ ë³¼ì„ íˆ¬êµ¬í•  ìˆ˜ ìˆë„ë¡ ì„¤ì •
+                    canSpawnBall = true;
+
+                    // ê¸°ì¡´ ê³µì„ ë³€ìˆ˜ì—ì„œ ë¶„ë¦¬ (ë‚˜ì¤‘ì— ì œê±° ì˜ˆì •)
+                    GameObject oldBall = currentBall;
+                    currentBall = null;
+
+                    // ì§€ë©´ì— ë‹¿ì€ ê³µì€ ë” ë¹¨ë¦¬ ì œê±°
+                    StartCoroutine(DestroyBallAfterTime(oldBall, 1.0f));
+
+                    // ì¦‰ì‹œ ë‹¤ìŒ íˆ¬êµ¬ ì¤€ë¹„ ì‹œì‘
+                    if (isGameActive && currentAnimState == AnimationState.Idle && !isIdleAnimationInProgress)
+                    {
+                        PrepareNextPitch();
                         StartPitchAnimation();
                     }
-                    break;
 
-                case AnimationState.Pitching:
-                    if (!isPitchAnimationInProgress)
+                    if (debugMode)
                     {
-                        // Pitch ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ ¿Ï·áµÇ¸é ½ÃÄö½º Á¾·á
-                        currentAnimState = AnimationState.None;
+                        Debug.Log("ê³µì´ ì§€ë©´ì— ë‹¿ì•˜ìŠµë‹ˆë‹¤. ë‹¤ìŒ íˆ¬êµ¬ ì¦‰ì‹œ ì¤€ë¹„.");
                     }
-                    break;
+                }
+            }
+        }
+        else
+        {
+            // í˜„ì¬ ë³¼ì´ ì—†ìœ¼ë©´ ë‹¤ìŒ ë³¼ì„ íˆ¬êµ¬í•  ìˆ˜ ìˆë„ë¡ ì„¤ì •
+            canSpawnBall = true;
+        }
+    }
+
+    /**
+     * ì‹œê°„ í‘œì‹œ UI ì—…ë°ì´íŠ¸
+     */
+    private void UpdateTimeDisplay()
+    {
+        if (timeRemainingText != null)
+        {
+            int minutes = Mathf.FloorToInt(timeRemaining / 60);
+            int seconds = Mathf.FloorToInt(timeRemaining % 60);
+            timeRemainingText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+
+            // ë‚¨ì€ ì‹œê°„ì´ 30ì´ˆ ì´í•˜ì¼ ë•Œ ìƒ‰ìƒ ë³€ê²½
+            if (timeRemaining <= 30)
+            {
+                timeRemainingText.color = Color.red;
+            }
+            else
+            {
+                timeRemainingText.color = Color.white;
+            }
+        }
+    }
+
+    /**
+     * í˜„ì¬ ë³¼ì´ ì§€ë©´ì— ë‹¿ì•˜ëŠ”ì§€ í™•ì¸
+     */
+    /*
+    private void CheckCurrentBallLanded()
+    {
+        if (currentBall != null)
+        {
+            BallController ballController = currentBall.GetComponent<BallController>();
+            if (ballController != null && ballController.hasLanded)
+            {
+                // ë³¼ì´ ì§€ë©´ì— ë‹¿ì•˜ìœ¼ë©´ ë‹¤ìŒ ë³¼ì„ íˆ¬êµ¬í•  ìˆ˜ ìˆë„ë¡ ì„¤ì •
+                canSpawnBall = true;
+
+                if (debugMode)
+                {
+                    Debug.Log("ê³µì´ ì§€ë©´ì— ë‹¿ì•˜ìŠµë‹ˆë‹¤. ë‹¤ìŒ íˆ¬êµ¬ ì¤€ë¹„.");
+                }
+            }
+        }
+        else
+        {
+            // í˜„ì¬ ë³¼ì´ ì—†ìœ¼ë©´ ë‹¤ìŒ ë³¼ì„ íˆ¬êµ¬í•  ìˆ˜ ìˆë„ë¡ ì„¤ì •
+            canSpawnBall = true;
+        }
+    }
+    */
+
+    /**
+     * ìë™ íˆ¬êµ¬ ì‹œí€€ìŠ¤ë¥¼ ì œì–´í•˜ëŠ” ì½”ë£¨í‹´
+     */
+    private IEnumerator AutomaticPitchingSequence()
+    {
+        while (isGameActive)
+        {
+            // ìƒˆ ë³¼ì„ íˆ¬êµ¬í•  ìˆ˜ ìˆëŠ” ìƒíƒœë¼ë©´
+            if (canSpawnBall && currentBall == null)  // í˜„ì¬ ê³µì´ ì—†ì„ ë•Œë§Œ
+            {
+                // ì•„ì´ë“¤ ìƒíƒœì¸ ê²½ìš° íˆ¬êµ¬ ì• ë‹ˆë©”ì´ì…˜ ì‹œì‘
+                if (currentAnimState == AnimationState.Idle && !isIdleAnimationInProgress)
+                {
+                    // íˆ¬êµ¬ ì„¤ì • ì¤€ë¹„
+                    PrepareNextPitch();
+
+                    // íˆ¬êµ¬ ì• ë‹ˆë©”ì´ì…˜ ì‹œì‘
+                    StartPitchAnimation();
+
+                    // ë‹¤ìŒ ë³¼ì„ íˆ¬êµ¬í•  ìˆ˜ ì—†ëŠ” ìƒíƒœë¡œ ì„¤ì •
+                    canSpawnBall = false;
+                }
+                // ì• ë‹ˆë©”ì´ì…˜ ìƒíƒœê°€ ì—†ëŠ” ê²½ìš° ì•„ì´ë“¤ ì• ë‹ˆë©”ì´ì…˜ ì‹œì‘
+                else if (currentAnimState == AnimationState.None)
+                {
+                    StartIdleAnimation();
+                }
+            }
+
+            // íˆ¬êµ¬ ì• ë‹ˆë©”ì´ì…˜ì´ ëë‚¬ê³  ë‹¤ìŒ íˆ¬êµ¬ë¥¼ ìœ„í•´ ëŒ€ê¸° ì¤‘ì¸ ê²½ìš°
+            if (currentAnimState == AnimationState.Pitching && !isPitchAnimationInProgress)
+            {
+                // ì•„ì´ë“¤ ì• ë‹ˆë©”ì´ì…˜ìœ¼ë¡œ ì „í™˜
+                StartIdleAnimation();
             }
 
             yield return null;
@@ -327,51 +494,46 @@ public class HomerunSpawner : MonoBehaviour
     }
 
     /**
-     * Idle ¾Ö´Ï¸ŞÀÌ¼ÇÀ» ½ÃÀÛÇÏ´Â ¸Ş¼­µå
+     * ë‹¤ìŒ íˆ¬êµ¬ë¥¼ ìœ„í•œ ì„¤ì • ì¤€ë¹„
+     */
+    private void PrepareNextPitch()
+    {
+        // íˆ¬êµ¬ ì„¤ì • ì„ íƒ
+        pendingBallSettings = currentPitchSettings[speedIndex % currentPitchSettings.Count];
+
+        targetP = initialTargetP;
+
+        if (debugMode)
+        {
+            Debug.Log($"ë‹¤ìŒ íˆ¬êµ¬ ì¤€ë¹„: ì†ë„={speedValues[speedIndex]} km/h, íƒ€ê²Ÿ ìœ„ì¹˜={targetP}");
+        }
+    }
+
+    /**
+     * Idle ì• ë‹ˆë©”ì´ì…˜ì„ ì‹œì‘í•˜ëŠ” ë©”ì„œë“œ
      */
     private void StartIdleAnimation()
     {
         if (pitcherAnimator == null || isIdleAnimationInProgress)
             return;
 
-        // ´Ù¸¥ Æ®¸®°Å ¸®¼Â
-        pitcherAnimator.ResetTrigger(readyAnimTrigger);
+        // ë‹¤ë¥¸ íŠ¸ë¦¬ê±° ë¦¬ì…‹
         pitcherAnimator.ResetTrigger(pitchAnimTrigger);
 
         isIdleAnimationInProgress = true;
         currentAnimState = AnimationState.Idle;
 
-        // Idle ¾Ö´Ï¸ŞÀÌ¼Ç Æ®¸®°Å ¼³Á¤
+        // Idle ì• ë‹ˆë©”ì´ì…˜ íŠ¸ë¦¬ê±° ì„¤ì •
         pitcherAnimator.SetTrigger(idleAnimTrigger);
 
         if (debugMode && logAnimationEvents)
         {
-            Debug.Log("Idle ¾Ö´Ï¸ŞÀÌ¼Ç ½ÃÀÛ");
+            Debug.Log("Idle ì• ë‹ˆë©”ì´ì…˜ ì‹œì‘");
         }
     }
 
     /**
-     * Ready ¾Ö´Ï¸ŞÀÌ¼ÇÀ» ½ÃÀÛÇÏ´Â ¸Ş¼­µå
-     */
-    private void StartReadyAnimation()
-    {
-        if (pitcherAnimator == null || isReadyAnimationInProgress)
-            return;
-
-        isReadyAnimationInProgress = true;
-        currentAnimState = AnimationState.Ready;
-
-        // Ready ¾Ö´Ï¸ŞÀÌ¼Ç Æ®¸®°Å ¼³Á¤
-        pitcherAnimator.SetTrigger(readyAnimTrigger);
-
-        if (debugMode && logAnimationEvents)
-        {
-            Debug.Log("Ready ¾Ö´Ï¸ŞÀÌ¼Ç ½ÃÀÛ");
-        }
-    }
-
-    /**
-     * Pitch ¾Ö´Ï¸ŞÀÌ¼ÇÀ» ½ÃÀÛÇÏ´Â ¸Ş¼­µå
+     * Pitch ì• ë‹ˆë©”ì´ì…˜ì„ ì‹œì‘í•˜ëŠ” ë©”ì„œë“œ
      */
     private void StartPitchAnimation()
     {
@@ -381,125 +543,118 @@ public class HomerunSpawner : MonoBehaviour
         isPitchAnimationInProgress = true;
         currentAnimState = AnimationState.Pitching;
 
-        // Pitch ¾Ö´Ï¸ŞÀÌ¼Ç Æ®¸®°Å ¼³Á¤
+        // Pitch ì• ë‹ˆë©”ì´ì…˜ íŠ¸ë¦¬ê±° ì„¤ì •
         pitcherAnimator.SetTrigger(pitchAnimTrigger);
 
         if (debugMode && logAnimationEvents)
         {
-            Debug.Log("Pitch ¾Ö´Ï¸ŞÀÌ¼Ç ½ÃÀÛ");
+            Debug.Log($"íˆ¬êµ¬ ì• ë‹ˆë©”ì´ì…˜ ì‹œì‘ (êµ¬ì¢…: {pitchTypeName})");
         }
     }
 
     /**
-     * ¾Ö´Ï¸ŞÀÌ¼Ç ÀÌº¥Æ®¿¡¼­ È£ÃâµÇ´Â Idle ¾Ö´Ï¸ŞÀÌ¼Ç ¿Ï·á ¸Ş¼­µå
+     * ì• ë‹ˆë©”ì´ì…˜ ì´ë²¤íŠ¸ì—ì„œ í˜¸ì¶œë˜ëŠ” Idle ì• ë‹ˆë©”ì´ì…˜ ì™„ë£Œ ë©”ì„œë“œ
      */
     public void OnIdleAnimationComplete()
     {
-        // Æ®¸®°Å ¸®¼Â
+        // íŠ¸ë¦¬ê±° ë¦¬ì…‹
         pitcherAnimator.ResetTrigger(idleAnimTrigger);
 
-        // »óÅÂ ¾÷µ¥ÀÌÆ®
+        // ìƒíƒœ ì—…ë°ì´íŠ¸
         isIdleAnimationInProgress = false;
 
         if (debugMode && logAnimationEvents)
         {
-            Debug.Log("Idle ¾Ö´Ï¸ŞÀÌ¼Ç ¿Ï·á");
+            Debug.Log("Idle ì• ë‹ˆë©”ì´ì…˜ ì™„ë£Œ");
         }
     }
 
     /**
-     * Ready ¾Ö´Ï¸ŞÀÌ¼Ç ¿Ï·á ÈÄ Æ®¸®°Å ¸®¼Â ¸Ş¼­µå
-     */
-    public void OnReadyAnimationComplete()
-    {
-        // Æ®¸®°Å ¸®¼Â
-        pitcherAnimator.ResetTrigger(readyAnimTrigger);
-
-        // »óÅÂ ¾÷µ¥ÀÌÆ®
-        isReadyAnimationInProgress = false;
-
-        if (debugMode && logAnimationEvents)
-        {
-            Debug.Log("Ready ¾Ö´Ï¸ŞÀÌ¼Ç ¿Ï·á");
-        }
-    }
-
-    /**
-     * Pitch ¾Ö´Ï¸ŞÀÌ¼Ç ¿Ï·á ÈÄ Æ®¸®°Å ¸®¼Â ¸Ş¼­µå
+     * Pitch ì• ë‹ˆë©”ì´ì…˜ ì™„ë£Œ í›„ íŠ¸ë¦¬ê±° ë¦¬ì…‹ ë©”ì„œë“œ
      */
     public void OnPitchAnimationComplete()
     {
-        // Æ®¸®°Å ¸®¼Â
+        // íŠ¸ë¦¬ê±° ë¦¬ì…‹
         pitcherAnimator.ResetTrigger(pitchAnimTrigger);
 
-        // »óÅÂ ¾÷µ¥ÀÌÆ®
+        // ìƒíƒœ ì—…ë°ì´íŠ¸
         isPitchAnimationInProgress = false;
 
         if (debugMode && logAnimationEvents)
         {
-            Debug.Log("Pitch ¾Ö´Ï¸ŞÀÌ¼Ç ¿Ï·á");
+            Debug.Log("Pitch ì• ë‹ˆë©”ì´ì…˜ ì™„ë£Œ");
         }
     }
 
     /**
-     * ¾Ö´Ï¸ŞÀÌ¼Ç ÀÌº¥Æ®¿¡¼­ È£ÃâµÇ´Â °ø ¹ß»ç ¸Ş¼­µå
+     * ì• ë‹ˆë©”ì´ì…˜ ì´ë²¤íŠ¸ì—ì„œ í˜¸ì¶œë˜ëŠ” ê³µ ë°œì‚¬ ë©”ì„œë“œ
      */
     public void OnAnimationReleaseBall()
     {
-        // ³²Àº °ø °³¼ö È®ÀÎ
-        if (remainingBallCount <= 0)
-            return;
-
-        // °ø »ı¼º
-        GameObject ball = Instantiate(ballPrefab, releasePoint.position, releasePoint.rotation);
-
-        // °ø¿¡ ¼³Á¤ Àû¿ë
-        ApplyBallSettings(ball);
-
-        // ÀÏÁ¤ ½Ã°£ ÈÄ °ø Á¦°Å
-        StartCoroutine(DestroyBallAfterTime(ball, destroyTime));
-
-        // ³²Àº °ø °³¼ö °¨¼Ò
-        remainingBallCount--;
-        UpdateBallCountDisplay();
-
-        if (debugMode && logBallInfo)
+        // ê²Œì„ì´ í™œì„±í™”ëœ ìƒíƒœì¼ ë•Œë§Œ ê³µ ìƒì„±
+        if (!isGameActive)
         {
-            Debug.Log($"°øÀÌ ¹ß»çµÇ¾ú½À´Ï´Ù. ³²Àº °ø: {remainingBallCount}/{totalBallCount}");
+            Debug.Log("ê²Œì„ì´ ë¹„í™œì„±í™” ìƒíƒœì—¬ì„œ ê³µ ìƒì„±ì„ ê±´ë„ˆëœë‹ˆë‹¤.");
+            return;
+        }
+        if(isGameActive)
+        {
+            Debug.Log("ê²Œì„ì´ ìƒì„±ì„ ê±´ë„ˆëœë‹ˆë‹¤.");
+        }
+
+        // ê³µ ìƒì„±
+        currentBall = Instantiate(ballPrefab, releasePoint.position, releasePoint.rotation);
+
+        // ê³µì— ì„¤ì • ì ìš©
+        ApplyBallSettings(currentBall);
+
+        totalPitchCount++;
+
+        Debug.Log("" + totalPitchCount + "");
+
+
+        UpdateHomeRunDisplay();
+
+        // ì¼ì • ì‹œê°„ í›„ ê³µ ì œê±°
+        StartCoroutine(DestroyBallAfterTime(currentBall, destroyTime));
+
+            Debug.Log($"{pitchTypeName} ê³µì´ ìƒì„±ë˜ê³  ë°œì‚¬ë˜ì—ˆìŠµë‹ˆë‹¤. ì†ë„: {pendingBallSettings.throwPower * 0.36f:F1}km/h");
+
+    }
+
+    private void UpdateHomeRunDisplay()
+    {
+        if (homeRunCountText != null)
+        {
+            homeRunCountText.text = string.Format("HomeRun: {0} / {1}", homeRunCount, totalPitchCount);
         }
     }
 
     /**
-     * »ı¼ºµÈ °ø¿¡ ¼³Á¤ Àû¿ë
+     * ìƒì„±ëœ ê³µì— ì„¤ì • ì ìš©
      */
     private void ApplyBallSettings(GameObject ball)
     {
-        // BallController ÄÄÆ÷³ÍÆ® È®ÀÎ
+        // BallController ì»´í¬ë„ŒíŠ¸ í™•ì¸
         BallController ballController = ball.GetComponent<BallController>();
         if (ballController != null)
         {
-            // Á÷Á¢ ¼³Á¤ Àû¿ë
-            ballController.initialForce = initialForce;
-            ballController.verticalRotationSpeed = verticalRotationSpeed;
-            ballController.horizontalRotationSpeed = horizontalRotationSpeed;
-            ballController.verticalAngleOffset = verticalAngleOffset;
-            ballController.horizontalAngleOffset = horizontalAngleOffset;
-            ballController.initialRotationAngleX = initialRotationAngleX;
-            ballController.initialRotationAngleZ = initialRotationAngleZ;
-            ballController.brakingDelay = brakingDelay;
+            // ì„¤ì • ì ìš©
+            ballController.SetBallSettings(pendingBallSettings);
+            ballController.SetPitchType(pitchTypeName);
 
-            // ¹ß»ç ¹æÇâ °è»ê ¹× ¹ß»ç
-            ballController.CalculateDirection(releasePoint.position, targetPosition);
+            // ë°œì‚¬ ë°©í–¥ ê³„ì‚° ë° ë°œì‚¬
+            ballController.CalculateDirection(releasePoint.position, targetP);
             ballController.LaunchBall();
         }
         else if (debugMode)
         {
-            Debug.LogError("º¼ ÇÁ¸®ÆÕ¿¡ BallController ÄÄÆ÷³ÍÆ®°¡ ¾ø½À´Ï´Ù!");
+            Debug.LogError("ë³¼ í”„ë¦¬íŒ¹ì— BallController ì»´í¬ë„ŒíŠ¸ê°€ ì—†ìŠµë‹ˆë‹¤!");
         }
     }
 
     /**
-     * ÀÏÁ¤ ½Ã°£ ÈÄ °øÀ» Á¦°ÅÇÏ´Â ÄÚ·çÆ¾
+     * ì¼ì • ì‹œê°„ í›„ ê³µì„ ì œê±°í•˜ëŠ” ì½”ë£¨í‹´
      */
     private IEnumerator DestroyBallAfterTime(GameObject ball, float time)
     {
@@ -507,32 +662,53 @@ public class HomerunSpawner : MonoBehaviour
 
         if (ball != null)
         {
+            if (ball == currentBall)
+            {
+                currentBall = null;
+                canSpawnBall = true;
+            }
+
             Destroy(ball);
 
             if (debugMode && logBallInfo)
             {
-                Debug.Log($"°ø ÀÚµ¿ Á¦°Å: {time}ÃÊ ÈÄ");
+                Debug.Log($"ê³µ ìë™ ì œê±°: {time}ì´ˆ í›„");
             }
         }
     }
 
     /**
-     * Å¸°Ù À§Ä¡¸¦ ½Ã°¢ÀûÀ¸·Î Ç¥½Ã
+     * í˜„ì¬ ì„ íƒëœ êµ¬ì¢…ê³¼ êµ¬ì† ì •ë³´ë¥¼ TextMeshProë¡œ ì¶œë ¥í•˜ëŠ” ë©”ì„œë“œ
+     */
+    public void UpdatePitchInfoDisplay()
+    {
+        if (pitchInfoText == null)
+            return;
+
+        // í˜„ì¬ ì„ íƒëœ êµ¬ì† ê°€ì ¸ì˜¤ê¸°
+        int currentSpeed = speedValues[speedIndex];
+
+        // í™ˆëŸ° ë”ë¹„ ëª¨ë“œ í…ìŠ¤íŠ¸ í‘œì‹œ
+        pitchInfoText.text = string.Format("<color=#FF6B00>HomeRun Derby</color>\n{0} km/h", currentSpeed);
+    }
+
+    /**
+     * íƒ€ê²Ÿ ìœ„ì¹˜ë¥¼ ì‹œê°ì ìœ¼ë¡œ í‘œì‹œ
      */
     private void OnDrawGizmos()
     {
         if (!showTargetGizmo || !Application.isPlaying)
             return;
 
-        // Å¸°Ù À§Ä¡ Ç¥½Ã
+        // íƒ€ê²Ÿ ìœ„ì¹˜ í‘œì‹œ
         Gizmos.color = targetGizmoColor;
-        Gizmos.DrawSphere(targetPosition, targetGizmoSize);
+        Gizmos.DrawSphere(targetP, targetGizmoSize);
 
-        // µğ¹ö±× ¸ğµåÀÏ ¶§ Ãß°¡ Á¤º¸ Ç¥½Ã
+        // ë””ë²„ê·¸ ëª¨ë“œì¼ ë•Œ ì¶”ê°€ ì •ë³´ í‘œì‹œ
         if (debugMode && releasePoint != null)
         {
-            // Åõ±¸ °æ·Î Ç¥½Ã
-            Gizmos.DrawLine(releasePoint.position, targetPosition);
+            // íˆ¬êµ¬ ê²½ë¡œ í‘œì‹œ
+            Gizmos.DrawLine(releasePoint.position, targetP);
         }
     }
 }

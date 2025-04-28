@@ -92,6 +92,11 @@ public class BallController : MonoBehaviour
     [Tooltip("최대 수직 속도")]
     [SerializeField] private float maxVerticalVelocity = 20f; // 최대 수직 속도
 
+    [Header("홈런 판정")]
+    public bool isHomeRun = false;
+    public bool isHomeRunCounted = false; // BallSpawner에서 중복 카운트 방지용
+
+
     // 충돌 이벤트가 여러번 호출되는 것을 방지하기 위한 필드
     private float lastCollisionTime = 0f;
     [Tooltip("충돌 쿨다운 시간")]
@@ -110,8 +115,9 @@ public class BallController : MonoBehaviour
     public Vector3 launchPosition;
     public bool isCalculatingDistance = false; // private에서 public으로 변경
     private Vector3 lastPosition;
-    private float groundY = 0.01f; // 지면 높이 (필요에 따라 조정)
+    private float groundY = 0.05f; // 지면 높이 (필요에 따라 조정)
 
+    private bool isGround = false;
     /**
      * 매 프레임마다 호출되는 업데이트 함수
      * 오디오 볼륨을 업데이트하고 충돌 이후의 추가 물리 효과를 적용합니다.
@@ -427,6 +433,11 @@ public class BallController : MonoBehaviour
         // 충돌 발생 표시
         hasCollided = true;
 
+        if(collision.gameObject.CompareTag("Ground"))
+        {
+            isGround = true;
+        }
+
         // 속도 계산 및 출력 (반환값은 km/h 단위 속도)
         float finalSpeed = CalculateSpeed();
 
@@ -538,7 +549,7 @@ public class BallController : MonoBehaviour
                 reachedPeak = true;
             }
             // 최고점을 지나고 지면에 닿았는지 확인
-            if (reachedPeak && transform.position.y <= groundY)
+            if ((reachedPeak && transform.position.y <= groundY) || (reachedPeak && isGround == true))
             {
                 // 착지 위치 저장
                 Vector3 landingPosition = transform.position;
@@ -655,7 +666,35 @@ public class BallController : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        // 이미 홈런 판정이 난 경우 무시
+        if (isHomeRun)
+            return;
 
+        // "HomeRunZone" 태그를 가진 콜라이더와 충돌했는지 확인
+        if (other.CompareTag("HomeRunZone"))
+        {
+            // 홈런 판정
+            isHomeRun = true;
+
+            // 디버그 로그
+            if (debugMode)
+            {
+                Debug.Log($"홈런! 볼이 홈런 존을 통과했습니다. 위치: {transform.position}");
+            }
+
+        }
+    }
+
+    /**
+     * 홈런 판정 결과를 외부에서 확인하는 메서드
+     * @return 홈런 여부
+     */
+    public bool IsHomeRun()
+    {
+        return isHomeRun;
+    }
 }
 
 /**

@@ -1,4 +1,4 @@
-// PitchSettingsManager.cs
+Ôªø// PitchSettingsManager.cs
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,16 +9,18 @@ public class PitchSettingsManager : MonoBehaviour
     public List<BallSettings> sliderSettings;
     public List<BallSettings> curveSettings;
     public List<BallSettings> changeupSettings;
+    public List<BallSettings> homeRunDerbySettings;
 
     void Awake()
     {
-        // √ ±‚ º≥¡§ ∏ÆΩ∫∆Æ √ ±‚»≠
+        // Ï¥àÍ∏∞ ÏÑ§Ï†ï Î¶¨Ïä§Ìä∏ Ï¥àÍ∏∞Ìôî
         fastballSettings = new List<BallSettings>();
         sliderSettings = new List<BallSettings>();
         curveSettings = new List<BallSettings>();
         changeupSettings = new List<BallSettings>();
+        homeRunDerbySettings = new List<BallSettings>();
 
-        // ∞¢ ±∏¡æø° ¥Î«— º≥¡§ √ﬂ∞°
+        // Í∞Å Íµ¨Ï¢ÖÏóê ÎåÄÌïú ÏÑ§Ï†ï Ï∂îÍ∞Ä
         AddPitchSettings();
     }
     void AddPitchSettings()
@@ -74,5 +76,10 @@ public class PitchSettingsManager : MonoBehaviour
         changeupSettings.Add(new BallSettings(150, 150, -2200, 2200f, 1, 0, 45, -45, 0, 0));
         changeupSettings.Add(new BallSettings(160, 160, -2300, 2300, 0.5f, 0, 45, -45, 0, 0));
         changeupSettings.Add(new BallSettings(170, 170, -2400, 2400, 0, 0, 45, -45, 0, 0));
+
+
+
+        homeRunDerbySettings.Add(new BallSettings(60, 60, -1300f, 0, 11.8f, 0, 0, 0, 0, 0));
+
     }
 }

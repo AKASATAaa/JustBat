@@ -113,7 +113,7 @@ MonoBehaviour:
   magnusEffectConstant: 0.002
   horizontalRotationMultiplier: 1
   hasCollided: 0
-  whooshClip: {fileID: 0}
+  whooshClip: {fileID: 5057625998862375192}
   minVolume: 1
   maxVolume: 20
   volumeCurve: 3
@@ -126,6 +126,8 @@ MonoBehaviour:
   minBallVelocityAfterHit: 2
   gravityMultiplierAfterHit: 1.5
   maxVerticalVelocity: 20
+  isHomeRun: 0
+  isHomeRunCounted: 0
   debugMode: 0
   hasLanded: 0
   actualDistance: 0

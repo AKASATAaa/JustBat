@@ -20,6 +20,13 @@ public class SceneChanger : MonoBehaviour
         Invoke("tee", 0.5f);
         //SceneManager 메서드의 LoadScene 함수를 통해 acredev2.scene으로 씬 전환
     }
+    public void ToHomeRun()
+    {
+        fadeInOut.FadeOut();
+        // acredev2SceneChanger
+        Invoke("HR", 0.5f);
+        //SceneManager 메서드의 LoadScene 함수를 통해 acredev2.scene으로 씬 전환
+    }
 
 
     public void live()
@@ -29,5 +36,9 @@ public class SceneChanger : MonoBehaviour
     public void tee()
     {
         SceneManager.LoadScene("TeeBatting");
+    }
+    public void HR()
+    {
+        SceneManager.LoadScene("HomeRun");
     }
 }
