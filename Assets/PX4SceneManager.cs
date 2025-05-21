@@ -17,6 +17,7 @@ public class PX4SceneManager : MonoBehaviour
 
     private void Awake()
     {
+        ResetGame();
         // 싱글톤 설정
         if (Instance == null)
         {

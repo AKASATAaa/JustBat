@@ -133,6 +133,7 @@ MonoBehaviour:
   actualDistance: 0
   launchPosition: {x: 0, y: 0, z: 0}
   isCalculatingDistance: 0
+  rotationSpeed: 10000
 --- !u!54 &2087205923390704858
 Rigidbody:
   m_ObjectHideFlags: 0

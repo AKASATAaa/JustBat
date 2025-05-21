@@ -120,7 +120,7 @@ public class HitInfoDisplay : MonoBehaviour
                 {
                     // 실제 측정된 거리가 있으면 표시 형식 변경
                     distanceLabel = "dist(actual)";
-                    if (ball.actualDistance > 120)
+                    if (ball.actualDistance >= 120)
                         distanceValue = $"HOMERUN! {ball.actualDistance:F1}";
                     else
                         distanceValue = $"{ball.actualDistance:F1}";

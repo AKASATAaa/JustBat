@@ -1375,7 +1375,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   teeBallPrefab: {fileID: 3220906015835315101, guid: 41831f0f7b29d574cab3058bf0b6be99, type: 3}
   spawnPoint: {fileID: 581633366}
-  respawnDelay: 5
+  respawnDelay: 3
   spawnOnStart: 1
 --- !u!1 &605734821
 GameObject:
@@ -1725,6 +1725,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fadeInOut: {fileID: 966869640}
+  PX4SceneManager: {fileID: 0}
 --- !u!4 &888699332
 Transform:
   m_ObjectHideFlags: 0
@@ -5850,6 +5851,7 @@ MonoBehaviour:
   useRightHand: 1
   leftHandIntensityMultiplier: 1
   rightHandIntensityMultiplier: 1
+  isHomerun: 0
   currentVelocity: {x: 0, y: 0, z: 0}
 --- !u!54 &33494988737231317
 Rigidbody:

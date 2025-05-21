@@ -72,6 +72,7 @@ public class BatController : MonoBehaviour
     [SerializeField] private float leftHandIntensityMultiplier = 1.0f; // 왼손 진동 세기 계수
     [SerializeField] private float rightHandIntensityMultiplier = 1.0f; // 오른손 진동 세기 계수
 
+    public bool isHomerun = false;
 
     // 거리 계산 관련 비공개 변수
     private bool isCalculatingDistance = false; // 거리 계산 중인지 여부
@@ -338,6 +339,11 @@ public class BatController : MonoBehaviour
     {
         Vector3 closestPoint = other.ClosestPoint(batSweetSpot.position);
         HandleBallCollision(other, closestPoint);
+
+        if(other.tag == "HomeRunZone")
+        {
+            isHomerun = true;
+        }
     }
 
     /// <summary>
@@ -610,7 +616,7 @@ public class BatController : MonoBehaviour
                                                           exitVelocity.z * exitVelocity.z)) * Mathf.Rad2Deg;
 
                 // 단순화된 비거리 계산
-                float estimatedDistance = CalculateSimpleDistance(exitVelocity);
+                //float estimatedDistance = CalculateSimpleDistance(exitVelocity);
 
                 // 타구 정보 업데이트
                 if (hitInfoDisplay != null)
@@ -619,7 +625,7 @@ public class BatController : MonoBehaviour
                     {
                         ExitVelocity = exitVelocityKMH,
                         LaunchAngle = launchAngle,
-                        EstimatedDistance = estimatedDistance,
+                        //EstimatedDistance = estimatedDistance,
                         Direction = exitVelocity.normalized,
                         SpinRate = spinRate,
                         SpinAxis = spinAxis,
@@ -634,7 +640,7 @@ public class BatController : MonoBehaviour
                 PlayHitSound(batSpeed, qualityFactor); // 품질 계수 전달
 
                 // 타격 데이터 로깅
-                Debug.Log($"Ball hit: Speed: {exitVelocityKMH:F1} km/h, Angle: {launchAngle:F1}°, Est. Distance: {estimatedDistance:F1}m, Quality: {qualityFactor:F2} ({qualityText})");
+                //Debug.Log($"Ball hit: Speed: {exitVelocityKMH:F1} km/h, Angle: {launchAngle:F1}°, Est. Distance: {estimatedDistance:F1}m, Quality: {qualityFactor:F2} ({qualityText})");
             }
             else
             {
@@ -785,7 +791,7 @@ public class BatController : MonoBehaviour
             }
         }
     }
-
+    /*
     /// <summary>
     /// 간단한 물리 공식으로 예상 타구 거리를 계산합니다.
     /// </summary>
@@ -805,6 +811,7 @@ public class BatController : MonoBehaviour
         // 너무 작은 값이나 음수가 나오지 않도록 보정
         return Mathf.Max(5f, distance);
     }
+    */
 
     /// <summary>
     /// 공이 실제로 땅에 착지할 때까지 기다리고 거리를 계산합니다.

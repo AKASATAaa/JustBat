@@ -12,6 +12,7 @@ TagManager:
   - Ground
   - HomeRUnZone
   - HomeRunZone
+  - PX
   layers:
   - Default
   - TransparentFX

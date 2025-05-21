@@ -117,6 +117,11 @@ public class BallController : MonoBehaviour
     private Vector3 lastPosition;
     private float groundY = 0.05f; // 지면 높이 (필요에 따라 조정)
 
+    public float rotationSpeed = 50000;
+
+    // 회전축 (기본값: Y축 주위로 회전)
+
+
     private bool isGround = false;
     /**
      * 매 프레임마다 호출되는 업데이트 함수
@@ -125,6 +130,8 @@ public class BallController : MonoBehaviour
     private void Update()
     {
         UpdateAudioVolume();
+
+        transform.Rotate(Vector3.right, rotationSpeed * Time.deltaTime);
 
         // 충돌 이후 추가적인 중력 영향 적용
         if (hasCollided && ballRigidbody != null)

@@ -7,6 +7,7 @@ using System.Xml.Serialization;
 public class SceneChanger : MonoBehaviour
 {
     public FadeInOut fadeInOut;
+    public GameObject PX4SceneManager;
         public void ToLiveBatting()
         // acredev1SceneChange 이름의 함수 선언
         {
