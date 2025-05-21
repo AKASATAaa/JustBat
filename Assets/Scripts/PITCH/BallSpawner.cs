@@ -129,14 +129,31 @@ public class BallSpawner : MonoBehaviour
         Underhand
     }
 
+
+    [Header("공 제한 설정")]
+    [Tooltip("최대 공 개수 (0은 무제한)")]
+    public int maxBallCount = 10;
+
+    // 현재까지 생성된 공의 개수
+    private int currentBallCount = 0;
+
+
+    // 게임 결과 패널 참조
+    public GameObject resultPanel;
+
+    // 모든 공을 던진 후 결과 표시 이벤트
+
+
+    public UnityEvent onAllBallsThrown = new UnityEvent();
+
     private PitchStyle currentPitchStyle = PitchStyle.Overhand;
 
     // 구종 및 속도 설정 관련 변수
     private PitchSettingsManager pitchSettingsManager;
     private List<BallSettings> currentPitchSettings;
-    private int speedIndex;
+    public int speedIndex;
     private int[] speedValues = { 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170 };
-    private bool isRandomMode;
+    public bool isRandomMode;
 
     // 목표 위치 관련 변수
     private Vector3 initialTargetP;
@@ -188,8 +205,8 @@ public class BallSpawner : MonoBehaviour
 
         // 초기 설정으로 패스트볼 선택
         currentPitchSettings = pitchSettingsManager.fastballSettings;
-        speedIndex = 0;
-        isRandomMode = false;
+        //speedIndex = 0;
+        //isRandomMode = false;
 
         // PitchRange 오브젝트 설정
         InitializePitchRange();
@@ -487,9 +504,9 @@ public class BallSpawner : MonoBehaviour
         isRandomMode = !isRandomMode;
 
         // 랜덤 모드에서는 최소 속도가 90km/h여야 함
-        if (isRandomMode && speedValues[speedIndex] < 90)
+        if (isRandomMode && speedValues[speedIndex] < 70)
         {
-            speedIndex = System.Array.IndexOf(speedValues, 90);
+            speedIndex = System.Array.IndexOf(speedValues, 70);
         }
 
         UpdatePitchInfoDisplay();
@@ -506,9 +523,9 @@ public class BallSpawner : MonoBehaviour
         }
 
         // 랜덤 모드에서는 최소 속도가 90km/h여야 함
-        if (isRandomMode && speedValues[speedIndex] < 90)
+        if (isRandomMode && speedValues[speedIndex] < 70)
         {
-            speedIndex = System.Array.IndexOf(speedValues, 90);
+            speedIndex = System.Array.IndexOf(speedValues, 70);
         }
 
         UpdatePitchInfoDisplay();
@@ -525,9 +542,9 @@ public class BallSpawner : MonoBehaviour
         }
 
         // 랜덤 모드에서는 최소 속도가 90km/h여야 함
-        if (isRandomMode && speedValues[speedIndex] < 90)
+        if (isRandomMode && speedValues[speedIndex] < 70)
         {
-            speedIndex = System.Array.IndexOf(speedValues, 90);
+            speedIndex = System.Array.IndexOf(speedValues, 70);
         }
 
         UpdatePitchInfoDisplay();
@@ -775,26 +792,75 @@ public class BallSpawner : MonoBehaviour
      * 애니메이션의 특정 프레임에서 이 메서드를 호출하여 공을 생성하고 발사합니다.
      */
     public void OnAnimationReleaseBall()
+    {
+        // 최대 공 개수 확인
+        if (maxBallCount > 0 && currentBallCount >= maxBallCount)
+        {
+            if (debugMode && logBallInfo)
             {
-                // 공 생성
-                GameObject ball = Instantiate(ballPrefab, releasePoint.position, releasePoint.rotation);
+                Debug.Log($"최대 공 개수({maxBallCount}개)에 도달하여 더 이상 공을 생성하지 않습니다.");
+            }
+            return; // 최대 개수 도달 시 공 생성 안함
+        }
 
-                // 공에 설정 적용
-                ApplyBallSettings(ball);
+        // 공 생성
+        GameObject ball = Instantiate(ballPrefab, releasePoint.position, releasePoint.rotation);
 
-                // 일정 시간 후 공 제거
-                StartCoroutine(DestroyBallAfterTime(ball, destroyTime));
+        // 공 개수 증가
+        currentBallCount++;
 
-                if (debugMode && logBallInfo)
-                {
-                    Debug.Log($"{pendingPitchType} 공이 생성되고 발사되었습니다. 투구 스타일: {currentPitchStyle}, 속도: {pendingBallSettings.throwPower * 0.36f:F1}km/h");
-                }
+        // 공에 설정 적용
+        ApplyBallSettings(ball);
+
+        // 일정 시간 후 공 제거
+        StartCoroutine(DestroyBallAfterTime(ball, destroyTime));
+
+        if (debugMode && logBallInfo)
+        {
+            Debug.Log($"[{currentBallCount}/{maxBallCount}] {pendingPitchType} 공이 생성되고 발사되었습니다. 투구 스타일: {currentPitchStyle}, 속도: {pendingBallSettings.throwPower * 0.36f:F1}km/h");
+        }
+
+        // 최대 공 개수에 도달한 경우
+        if (maxBallCount > 0 && currentBallCount >= maxBallCount)
+        {
+            if (debugMode)
+            {
+                Debug.Log($"최대 공 개수({maxBallCount}개)에 도달하여 투구를 종료합니다.");
             }
 
-            /**
-             * 생성된 공에 설정 적용
-             */
-            private void ApplyBallSettings(GameObject ball)
+            // 마지막 공을 던진 후 2초 후에 결과 패널 표시
+            StartCoroutine(ShowResultAfterDelay(2.0f));
+        }
+    }
+
+    // 일정 시간 후 결과 패널을 표시하는 코루틴
+    private IEnumerator ShowResultAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        // 이벤트 발생 - 모든 공을 던졌음을 알림
+        onAllBallsThrown.Invoke();
+
+        // 결과 패널이 설정되어 있으면 활성화
+        if (resultPanel != null)
+        {
+            resultPanel.SetActive(true);
+
+            if (debugMode)
+            {
+                Debug.Log("결과 패널 표시");
+            }
+        }
+        else if (debugMode)
+        {
+            Debug.LogWarning("결과 패널이 설정되지 않았습니다.");
+        }
+    }
+
+    /**
+     * 생성된 공에 설정 적용
+     */
+    private void ApplyBallSettings(GameObject ball)
             {
                 // BallController 컴포넌트 확인
                 BallController ballController = ball.GetComponent<BallController>();
@@ -1181,4 +1247,182 @@ public class BallSpawner : MonoBehaviour
                 // 회전 방향 화살표 표시
                 Gizmos.DrawRay(position, axis * 0.2f);
             }
+
+
+
+    public bool SetSpeed(int speed)
+    {
+        // speedValues 배열에서 해당 속도에 맞는 인덱스 찾기
+        int index = -1;
+        for (int i = 0; i < speedValues.Length; i++)
+        {
+            if (speedValues[i] == speed)
+            {
+                index = i;
+                break;
+            }
         }
+
+        // 유효한 인덱스가 아니면 실패
+        if (index < 0 || index >= speedValues.Length)
+        {
+            if (debugMode)
+            {
+                Debug.LogWarning($"유효하지 않은 구속입니다: {speed}km/h");
+            }
+            return false;
+        }
+
+        // 인덱스 설정 및 UI 업데이트
+        speedIndex = index;
+        UpdatePitchInfoDisplay();
+
+        if (debugMode)
+        {
+            Debug.Log($"구속 설정: {speed}km/h (인덱스: {speedIndex})");
+        }
+
+        return true;
+    }
+
+    /**
+     * 외부에서 구질 모드를 설정하는 메서드
+     * @param isRandom true면 랜덤 모드, false면 직구(현재 선택된 구종) 모드
+     */
+    public void SetPitchMode(bool isRandom)
+    {
+        isRandomMode = isRandom;
+
+        // 랜덤 모드일 때는 최소 속도가 90km/h이어야 함
+        if (isRandomMode && speedValues[speedIndex] < 90)
+        {
+            int newIndex = 0;
+            for (int i = 0; i < speedValues.Length; i++)
+            {
+                if (speedValues[i] >= 90)
+                {
+                    newIndex = i;
+                    break;
+                }
+            }
+            speedIndex = newIndex;
+        }
+
+        // 직구 모드일 경우 패스트볼 선택
+        if (!isRandom)
+        {
+            currentPitchSettings = pitchSettingsManager.fastballSettings;
+            pitchTypeName = "Fastball";
+        }
+
+        // UI 업데이트
+        UpdatePitchInfoDisplay();
+
+        if (debugMode)
+        {
+            Debug.Log($"구질 모드 설정: {(isRandom ? "랜덤" : "직구(패스트볼)")}");
+        }
+    }
+
+    /**
+     * 외부에서 투구 스타일을 설정하는 메서드
+     * @param style 설정할 투구 스타일 (0: 오버핸드, 1: 사이드암, 2: 쓰리쿼터, 3: 언더핸드)
+     * @return 설정 성공 여부
+     */
+    public bool SetPitchStyle(int style)
+    {
+        switch (style)
+        {
+            case 0:
+                currentPitchStyle = PitchStyle.Overhand;
+                break;
+            case 1:
+                currentPitchStyle = PitchStyle.Sidearm;
+                break;
+            case 2:
+                currentPitchStyle = PitchStyle.ThreeQuarter;
+                break;
+            case 3:
+                currentPitchStyle = PitchStyle.Underhand;
+                break;
+            default:
+                if (debugMode)
+                {
+                    Debug.LogWarning($"유효하지 않은 투구 스타일 인덱스: {style}");
+                }
+                return false;
+        }
+
+        // UI 업데이트
+        UpdatePitchInfoDisplay();
+
+        if (debugMode)
+        {
+            Debug.Log($"투구 스타일 설정: {currentPitchStyle}");
+        }
+
+        return true;
+    }
+
+    /**
+     * 특정 구종을 선택하는 공개 메서드
+     * @param pitchType 구종 유형 (0: 패스트볼, 1: 슬라이더, 2: 커브, 3: 체인지업)
+     * @return 설정 성공 여부
+     */
+    public bool SelectPitchTypeByIndex(int pitchType)
+    {
+        switch (pitchType)
+        {
+            case 0:
+                currentPitchSettings = pitchSettingsManager.fastballSettings;
+                pitchTypeName = "Fastball";
+                break;
+            case 1:
+                currentPitchSettings = pitchSettingsManager.sliderSettings;
+                pitchTypeName = "Slider";
+                break;
+            case 2:
+                currentPitchSettings = pitchSettingsManager.curveSettings;
+                pitchTypeName = "Curve";
+                break;
+            case 3:
+                currentPitchSettings = pitchSettingsManager.changeupSettings;
+                pitchTypeName = "Changeup";
+                break;
+            default:
+                if (debugMode)
+                {
+                    Debug.LogWarning($"유효하지 않은 구종 유형 인덱스: {pitchType}");
+                }
+                return false;
+        }
+
+        isRandomMode = false;
+        UpdatePitchInfoDisplay();
+
+        if (debugMode)
+        {
+            Debug.Log($"구종 선택: {pitchTypeName}");
+        }
+
+        return true;
+    }
+
+    /**
+     * 현재 설정 정보 로그 출력 메서드
+     */
+    public void LogCurrentSettings()
+    {
+        if (!debugMode)
+            return;
+
+        Debug.Log("======= 현재 BallSpawner 설정 =======");
+        Debug.Log($"구종: {(isRandomMode ? "랜덤" : pitchTypeName)}");
+        Debug.Log($"구속: {speedValues[speedIndex]}km/h");
+        Debug.Log($"투구 스타일: {currentPitchStyle}");
+        Debug.Log("===================================");
+    }
+
+
+
+}

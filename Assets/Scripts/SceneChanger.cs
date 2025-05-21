@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine;
+using System.Xml.Serialization;
 
 public class SceneChanger : MonoBehaviour
 {
@@ -28,6 +29,10 @@ public class SceneChanger : MonoBehaviour
         //SceneManager 메서드의 LoadScene 함수를 통해 acredev2.scene으로 씬 전환
     }
 
+    public void ResetScenePX4()
+    {
+        SceneManager.LoadScene("PX4TeeBatting");
+    }
 
     public void live()
     {

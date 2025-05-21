@@ -27,6 +27,9 @@ public class HitInfoDisplay : MonoBehaviour
     // 타이머 관련
     private Coroutine clearTextCoroutine;
 
+    public delegate void HitInfoUpdatedHandler(HitInfo hitInfo);
+    public event HitInfoUpdatedHandler OnHitInfoUpdated;
+
     private void Start()
     {
         // TextMeshPro가 연결되어 있지 않다면 자식에서 찾기
@@ -86,6 +89,8 @@ public class HitInfoDisplay : MonoBehaviour
 
         // 새 코루틴 시작
         clearTextCoroutine = StartCoroutine(ClearAfterDelay());
+
+        OnHitInfoUpdated?.Invoke(hitInfo);
     }
 
     // 현재 표시 중인 타격 정보 반환
