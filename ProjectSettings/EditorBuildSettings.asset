@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/PX4TeeBatting.unity
-    guid: 5cdd09fe192fa7f4f88286ce6753956f
+    path: Assets/Scenes/PXTee.unity
+    guid: c32c23ff072bc3c418429d048ba28b5f
   - enabled: 1
     path: Assets/Scenes/PX4LiveBatting.unity
     guid: 295b1944903a126479225fd104b0ef94
@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/LiveBatting.unity
     guid: 8e5861a9ccb97bd4aacb4f4cbb10f352
+  - enabled: 0
+    path: Assets/Scenes/PX4TeeBatting.unity
+    guid: 5cdd09fe192fa7f4f88286ce6753956f
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 09b04fbbc7475004c997922dc58887cc, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: b48efac9fb161124881e5b47a41e5a7b, type: 2}

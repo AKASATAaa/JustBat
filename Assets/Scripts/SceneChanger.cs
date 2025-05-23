@@ -35,6 +35,16 @@ public class SceneChanger : MonoBehaviour
         SceneManager.LoadScene("PX4TeeBatting");
     }
 
+    public void ToPXLiveBatting()
+    {
+        SceneManager.LoadScene("PX4LiveBatting");
+    }
+
+    
+    public void ToPXTee()
+    {
+        SceneManager.LoadScene("PXTee");
+    }
     public void live()
     {
         SceneManager.LoadScene("LiveBatting");
