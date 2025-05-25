@@ -474,7 +474,7 @@ MonoBehaviour:
   targetGizmoColor: {r: 1, g: 0.5, b: 0, a: 0.5}
   targetGizmoSize: 0.1
   pitchTypeName: 
-  maxBallCount: 8
+  maxBallCount: 5
   resultPanel: {fileID: 1390846699}
   onAllBallsThrown:
     m_PersistentCalls:
@@ -1534,7 +1534,7 @@ Transform:
   m_GameObject: {fileID: 363672435}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.826, y: 0.824, z: 0.275}
+  m_LocalPosition: {x: 4.826, y: 0.9782, z: 0.275}
   m_LocalScale: {x: 0.42001894, y: 0.6948517, z: 0.087811746}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2261,7 +2261,7 @@ Transform:
   m_GameObject: {fileID: 490323617}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.697, y: 0.911, z: 0.275}
+  m_LocalPosition: {x: 4.697, y: 1.0652001, z: 0.275}
   m_LocalScale: {x: 0.4543741, y: 0.5417561, z: 0.09499425}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6605,7 +6605,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "\uBC30\uD305 \uC2DC\uC791\uC744 \uB20C\uB7EC\uC8FC\uC138\uC694!\n\uACF5\uC740
-    \uCD1D 8\uAC1C \uB358\uC838\uC9D1\uB2C8\uB2E4."
+    \uCD1D 5\uAC1C \uB358\uC838\uC9D1\uB2C8\uB2E4."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e9df6c0cb3516434ebc495b89bac9411, type: 2}
   m_sharedMaterial: {fileID: -1057604636198478955, guid: e9df6c0cb3516434ebc495b89bac9411, type: 2}
@@ -8260,7 +8260,7 @@ Transform:
   m_GameObject: {fileID: 1365483487}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.7392, y: 0.8208, z: 0.275}
+  m_LocalPosition: {x: 4.7392, y: 0.975, z: 0.275}
   m_LocalScale: {x: 0.7935885, y: 1.0082977, z: 0.1625}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11023,7 +11023,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1786959233}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 03a5df2202a8b96488c744be3bd0c33e, type: 3}
   m_Name: 
@@ -11037,7 +11037,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1786959233}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0bf296fc962d7184ab14ad1841598d5f, type: 3}
   m_Name: 
@@ -11745,7 +11745,7 @@ Transform:
   m_GameObject: {fileID: 1979666849}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.917, y: 0.875, z: 0.275}
+  m_LocalPosition: {x: 4.917, y: 1.0292001, z: 0.275}
   m_LocalScale: {x: 0.47497943, y: 0.56632406, z: 0.09930212}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13877,7 +13877,7 @@ Transform:
   m_GameObject: {fileID: 2082682761}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.827, y: 0.756, z: 0.275}
+  m_LocalPosition: {x: 4.827, y: 0.9102, z: 0.275}
   m_LocalScale: {x: 0.4443578, y: 0.5449333, z: 0.09048425}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13962,7 +13962,7 @@ Transform:
   m_GameObject: {fileID: 1968763601064033}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0.7043425, w: 0.7098603}
-  m_LocalPosition: {x: 4.207, y: 0.766, z: 0.24000001}
+  m_LocalPosition: {x: 4.205, y: 0.976, z: 0.24000001}
   m_LocalScale: {x: 1.1033986, y: 1.1033986, z: 1.1033993}
   m_ConstrainProportionsScale: 1
   m_Children:
