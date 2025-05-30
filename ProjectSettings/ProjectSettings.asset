@@ -12,7 +12,7 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: OuiSi
+  companyName: HNEA
   productName: JustBat
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
@@ -140,10 +140,8 @@ PlayerSettings:
   loadStoreDebugModeEnabled: 0
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
-  bundleVersion: PX4 1.0
-  preloadedAssets:
-  - {fileID: 11400000, guid: 09b04fbbc7475004c997922dc58887cc, type: 2}
-  - {fileID: -8109813164978681898, guid: b48efac9fb161124881e5b47a41e5a7b, type: 2}
+  bundleVersion: A0.71
+  preloadedAssets: []
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -164,7 +162,7 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.OuiSi.JustBat
+    Android: com.HNEA.JustBat
     Standalone: com.OuiSi.JustBat
   buildNumber:
     Standalone: 0
@@ -172,9 +170,9 @@ PlayerSettings:
     iPhone: 0
     tvOS: 0
   overrideDefaultApplicationIdentifier: 0
-  AndroidBundleVersionCode: 6
+  AndroidBundleVersionCode: 7
   AndroidMinSdkVersion: 23
-  AndroidTargetSdkVersion: 0
+  AndroidTargetSdkVersion: 34
   AndroidPreferredInstallLocation: 0
   aotOptions: 
   stripEngineCode: 1
@@ -291,7 +289,7 @@ PlayerSettings:
   - m_BuildTarget: 
     m_Icons:
     - serializedVersion: 2
-      m_Icon: {fileID: 2800000, guid: ed340816174586346a9f1eb33a4c5f5d, type: 3}
+      m_Icon: {fileID: 2800000, guid: 7710f47c843497e4cb5621b752860cc6, type: 3}
       m_Width: 128
       m_Height: 128
       m_Kind: 0
