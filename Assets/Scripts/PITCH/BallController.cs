@@ -262,7 +262,7 @@ public class BallController : MonoBehaviour
         }
 
         // 발사각 조정
-        Quaternion angleAdjustment = Quaternion.Euler(verticalAngleOffset, 0, horizontalAngleOffset);
+        Quaternion angleAdjustment = Quaternion.Euler(verticalAngleOffset, horizontalAngleOffset, 0);
         Vector3 adjustedDirection = angleAdjustment * launchDirection;
 
         // 발사 힘 정규화 및 적용
